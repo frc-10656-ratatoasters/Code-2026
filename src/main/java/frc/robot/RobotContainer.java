@@ -32,7 +32,6 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.grabber.Grabber;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -142,20 +141,14 @@ public class RobotContainer {
                 () -> new Rotation2d()));
 
     controller
-    .leftTrigger(.1).whileTrue(
-    grabber.setIntakeSpeedCommand(-1)); // left trigger is outake
+        .leftTrigger(.1)
+        .whileTrue(grabber.setIntakeSpeedCommand(-1)); // left trigger is outake
 
-    controller
-    .leftBumper().whileTrue(
-    grabber.setIntakeSpeedCommand(1)); //left bumper in intake
-    
-    controller
-    .y().whileTrue(
-    elevator.setElevatorSpeedCommand(1)); //y is raise elevator
+    controller.leftBumper().whileTrue(grabber.setIntakeSpeedCommand(1)); // left bumper in intake
 
-    controller
-    .a().whileTrue(
-    elevator.setElevatorSpeedCommand(-1));//a is lower elevator
+    controller.y().whileTrue(elevator.setElevatorSpeedCommand(1)); // y is raise elevator
+
+    controller.a().whileTrue(elevator.setElevatorSpeedCommand(-1)); // a is lower elevator
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
