@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -34,4 +35,5 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+  public Matrix<N3,N1> exampleMatrix = null;  
 }
