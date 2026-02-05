@@ -18,6 +18,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -53,7 +55,8 @@ public class RobotContainer {
   public final CommandXboxController OperatorController = new CommandXboxController(1);
 
   // Dashboard inputs
-  public final LoggedDashboardChooser<Command> autoChooser;
+ // public final LoggedDashboardChooser<Command> autoChooser;//the template version
+ private final SendableChooser<Command> autoChooser; //pathplanner docs version
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -94,7 +97,7 @@ public class RobotContainer {
 
     elevator = new Elevator();
     intake = new Intake();
-
+    /* this is the template auto chooser stuff, we are using pathplanner auto chooser now
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     autoChooser.addOption("goToTowerRight", DriveCommands.goToTowerRight(drive));
@@ -118,6 +121,10 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    */
+    // Pathplanner auto chooser
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   /**
@@ -158,8 +165,8 @@ public class RobotContainer {
     //controller.a().whileTrue(elevator.setElevatorSpeedCommand(-1)); // a is lower elevator
 
     // Switch to X pattern when X button is pressed
-    DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
+    //DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive)); //was in the template
+    DriveController.y().onTrue(Commands.runOnce(drive::resetGyro, drive));
     // Reset gyro to 0° when B button is pressed
     DriveController
         .b()
@@ -178,6 +185,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return autoChooser.getSelected();
   }
 }

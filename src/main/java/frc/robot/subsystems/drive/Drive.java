@@ -256,7 +256,11 @@ public class Drive extends SubsystemBase {
       modules[i].runCharacterization(output);
     }
   }
-
+  public void resetGyro(){
+    if(gyroIO instanceof GyroIOPigeon2){
+      ((GyroIOPigeon2) gyroIO).getPigeon2().getConfigurator().setYaw(0.0);
+    }
+  }
   public SwerveDrivePoseEstimator getPoseEstimator() {
     return poseEstimator;
   }
@@ -360,7 +364,7 @@ public class Drive extends SubsystemBase {
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return TunerConstants.kMaxSpeed.in(MetersPerSecond);
+    return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
   }
   // /** Returns the maximum linear speed in meters per sec. */
   // public double getMaxLinearSpeedMetersPerSec() {
