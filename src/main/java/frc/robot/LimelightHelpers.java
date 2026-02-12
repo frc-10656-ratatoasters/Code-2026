@@ -745,20 +745,16 @@ public class LimelightHelpers {
    * @return Array of RawFiducial objects containing detection details
    */
   public static RawFiducial[] getRawFiducials(String limelightName) {
-    System.out.println("Get RawFiducials called");
     var entry = LimelightHelpers.getLimelightNTTableEntry(limelightName, "rawfiducials");
     var rawFiducialArray = entry.getDoubleArray(new double[0]);
     
     for(double thing : rawFiducialArray){
-      System.out.println("entry:" + thing);
     }
     int valsPerEntry = 7;
     if (rawFiducialArray.length % valsPerEntry != 0) {
       return new RawFiducial[0];
     }
     else{
-      System.out.println("length of raw fiducialArray wrong?");
-      System.out.println("its "+ rawFiducialArray.length);
     }
    
     int numFiducials = rawFiducialArray.length / valsPerEntry;
@@ -842,7 +838,6 @@ public class LimelightHelpers {
     System.out.printf("Average Tag Distance: %.2f meters%n", pose.avgTagDist);
     System.out.printf("Average Tag Area: %.2f%% of image%n", pose.avgTagArea);
     System.out.printf("Is MegaTag2: %b%n", pose.isMegaTag2);
-    System.out.println();
 
     if (pose.rawFiducials == null || pose.rawFiducials.length == 0) {
       System.out.println("No RawFiducials data available.");
@@ -860,7 +855,6 @@ public class LimelightHelpers {
       System.out.printf("  Distance to Camera: %.2f meters%n", fiducial.distToCamera);
       System.out.printf("  Distance to Robot: %.2f meters%n", fiducial.distToRobot);
       System.out.printf("  Ambiguity: %.2f%n", fiducial.ambiguity);
-      System.out.println();
     }
   }
 
@@ -877,8 +871,6 @@ public class LimelightHelpers {
   }
 
   public static NetworkTableEntry getLimelightNTTableEntry(String tableName, String entryName) {
-    System.out.println("got the networktable entry");
-    System.out.println("networktable entry is " + getLimelightNTTable(tableName).getEntry(entryName).toString());
     return getLimelightNTTable(tableName).getEntry(entryName);
   }
 
@@ -1226,11 +1218,6 @@ public class LimelightHelpers {
    */
   public static Pose3d getBotPose3d_wpiBlue(String limelightName) {
     double[] poseArray = getLimelightNTDoubleArray(limelightName, "botpose_wpiblue");
-    System.out.println("got the 3d pose from limelight, returned");
-    for(double pose : poseArray){
-      System.out.println(pose + "/n");
-
-    }
 
     return toPose3D(poseArray);
   }
@@ -1299,7 +1286,6 @@ public class LimelightHelpers {
   public static Pose2d getBotPose2d_wpiBlue(String limelightName) {
 
     double[] result = getBotPose_wpiBlue(limelightName);
-    System.out.println("getBotPose2d for blue called, returning " + result.toString());
     return toPose2D(result);
   }
 

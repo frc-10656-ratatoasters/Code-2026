@@ -103,7 +103,6 @@ public class DriveCommands {
                   isFlipped
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
                       : drive.getRotation()));
-           System.out.println("Driven, drive.runVelocity ran");
         },
         drive);
   }

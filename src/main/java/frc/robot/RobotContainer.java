@@ -60,7 +60,8 @@ public class RobotContainer {
   public final CommandXboxController OperatorController = new CommandXboxController(1);
 
   // Dashboard inputs
-  public final SendableChooser<Command> autoChooser;
+ // public final LoggedDashboardChooser<Command> autoChooser;//the template version
+ private final SendableChooser<Command> autoChooser; //pathplanner docs version
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
@@ -105,18 +106,7 @@ public class RobotContainer {
 
     elevator = new Elevator();
     intake = new Intake();
-    //Registers the names of our commands for Path planner
-    NamedCommands.registerCommand("Intake", intake.IntakeCommand());
-    NamedCommands.registerCommand("Outtake", intake.OuttakeCommand());
-    NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
-
-    NamedCommands.registerCommand("Extend Arm", intake.extendArmCommand());
-    NamedCommands.registerCommand("Retract Arm", intake.retractArmCommand());
-    
-    autoChooser = AutoBuilder.buildAutoChooser();
-
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-/* 
+    /* this is the template auto chooser stuff, we are using pathplanner auto chooser now
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     autoChooser.addOption("goToTowerRight", DriveCommands.goToTowerRight(drive));
@@ -150,6 +140,9 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
+    // Pathplanner auto chooser
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   /**
@@ -190,16 +183,8 @@ public class RobotContainer {
     //controller.a().whileTrue(elevator.setElevatorSpeedCommand(-1)); // a is lower elevator
 
     // Switch to X pattern when X button is pressed
-    DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-    OperatorController.x().onTrue((Constants.currentMode == Constants.Mode.REAL) ? Commands.runOnce(drive :: resetGyro, drive) : null);
-      Commands.runOnce(() -> {
-        Pigeon2 pigeon = new Pigeon2(
-          TunerConstants.DrivetrainConstants.Pigeon2Id,
-          TunerConstants.DrivetrainConstants.CANBusName);
-        pigeon.reset();
-      }); Commands.none();
-    
+    //DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive)); //was in the template
+    DriveController.y().onTrue(Commands.runOnce(drive::zeroGyro, drive));
     // Reset gyro to 0° when B button is pressed
     DriveController
         .b()
@@ -219,7 +204,6 @@ public class RobotContainer {
    */
 
   public Command getAutonomousCommand() {
-    //return mainAutoChooser.getSelected();
     return autoChooser.getSelected();
   }
 

@@ -29,6 +29,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -52,14 +53,23 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.LimelightHelpers;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.drive.limelight.limelight;
+import frc.robot.subsystems.drive.limelight.Limelight;
 import frc.robot.util.LocalADStarAK;
+
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+  @AutoLogOutput
+  private static Pose3d limelightOnePose;
+  @AutoLogOutput
+  private static Pose3d limelightTwoPose;
+  @AutoLogOutput
+  private static Pose2d robotPose;
+  private static Optional<Alliance> alliance = DriverStation.getAlliance();
 
   public static RobotConfig robotConfig;
   static {
@@ -175,23 +185,31 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     // calling limelight periodic
-    limelight.periodic();
-    System.out.println("drive periodic called");
+    Limelight.periodic();
     String poseString = getPose().toString();
     SmartDashboard.putString("CurrentPose", poseString);
-    // SmartDashboard.putString("vision estimate", "limelight 1: "+
-    // LimelightHelpers.getBotPose2d("limelight-one") + "limelight 2" +
-    // LimelightHelpers.getBotPose2d("Limelight-Two"));
-    if (DriverStation.getAlliance().get() == Alliance.Red) {
-      poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d_wpiRed("limelight-one"), Timer.getFPGATimestamp());
-      // poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d_wpiRed("Limelight-two"),
-      // Timer.getFPGATimestamp());
-    } else if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d_wpiBlue("limelight-one"),
-          Timer.getFPGATimestamp());
-      // poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d_wpiBlue("Limelight-two"),
-      // Timer.getFPGATimestamp());
+    if (alliance.get() == Alliance.Red) {
+      if (LimelightHelpers.getTV("limelight-one")) {
+        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-one").pose,
+            Timer.getFPGATimestamp());
+      }
+      if (LimelightHelpers.getTV("limelight-two")) {
+        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-two").pose,
+            Timer.getFPGATimestamp());
+      }
+    } else if (alliance.get() == Alliance.Blue) {
+      if (LimelightHelpers.getTV("limelight-one")) {
+        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-one").pose,
+            Timer.getFPGATimestamp());
+      }
+      if (LimelightHelpers.getTV("limelight-two")) {
+        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-two").pose,
+            Timer.getFPGATimestamp());
+      }
     }
+    limelightOnePose = LimelightHelpers.getBotPose3d("limelight-one");
+    limelightTwoPose = LimelightHelpers.getBotPose3d("limelight-two");
+    robotPose = poseEstimator.getEstimatedPosition();
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -274,6 +292,12 @@ public class Drive extends SubsystemBase {
   public void runCharacterization(double output) {
     for (int i = 0; i < 4; i++) {
       modules[i].runCharacterization(output);
+    }
+  }
+
+  public void zeroGyro() {
+    if (gyroIO instanceof GyroIOPigeon2) {
+      ((GyroIOPigeon2) gyroIO).getPigeon2().getConfigurator().setYaw(0.0);
     }
   }
 
