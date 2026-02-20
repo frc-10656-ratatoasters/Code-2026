@@ -19,7 +19,7 @@ public class Climber extends SubsystemBase {
     followerElevatorMotor = new TalonFX(58); //change canID later
 
     followerElevatorMotor.setControl(new Follower (10,MotorAlignmentValue.Aligned));
-
+    //may have to invert??
    //followerElevatorMotor.setControlMode(ControlModeValue.Follower, leadElevatorMotor.getDeviceID());
   }
 
@@ -37,8 +37,8 @@ public class Climber extends SubsystemBase {
 //prob should make command
   public void stopClimber() {
     // Code to stop the climber mechanism
-    //probably does some sort of locking thing so it doeesnt fall off
-    
+    //probably does some sort of locking thing so it doeesnt fall off? idk
+    leadElevatorMotor.set(0);
   }
 
 }

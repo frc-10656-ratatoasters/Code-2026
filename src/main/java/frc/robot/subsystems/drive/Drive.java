@@ -27,6 +27,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -182,41 +183,56 @@ public class Drive extends SubsystemBase {
         new SysIdRoutine.Mechanism(
             (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
-
+  public void addVisionMeasurement(String limeLightName){
+    boolean doRejectUpdate = false;
+    LimelightHelpers.SetRobotOrientation("limelight-one", gyroIO.getYaw().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+    LimelightHelpers.SetRobotOrientation("limelight-two", gyroIO.getYaw().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+    //limelight has a IMU which is like a gyro
+    if(DriverStation.isDisabled()){
+      //this sets the limelights IMU to the same value as gyro so its super accurate once enabled
+      LimelightHelpers.SetIMUMode("limelight-one",1 );
+      LimelightHelpers.SetIMUMode("limelight-two",1 );
+    }
+    else{
+      //this makes it so that when its enabled, setRobotOrientation uses both our pigeon and the IMU in the limelight. Details in limelight docs.
+      LimelightHelpers.SetIMUMode("limelight-one",4 );
+      LimelightHelpers.SetIMUMode("limelight-two",4 );
+    }
+    LimelightHelpers.PoseEstimate limelightOneMt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-one");
+    LimelightHelpers.PoseEstimate limelightTwoMt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-two");
+    if(Math.abs(gyroIO.getYawVelocityDegreesPerSec()) > 360){
+      doRejectUpdate = true;
+    }
+    if(limelightOneMt2.tagCount == 0 && limelightTwoMt2.tagCount == 0){
+      doRejectUpdate = true;
+    }
+    if(!doRejectUpdate){
+      if (limelightOneMt2.tagCount > 0) {
+        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));//idk what this is its in limelight docs
+        poseEstimator.addVisionMeasurement(limelightOneMt2.pose, limelightOneMt2.timestampSeconds);
+      }
+      if (limelightTwoMt2.tagCount > 0) {
+        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));//idk what this is its in limelight docs
+        poseEstimator.addVisionMeasurement(limelightTwoMt2.pose, limelightTwoMt2.timestampSeconds);
+      }
+    }
+    
+  }
   @Override
   public void periodic() {
     // calling limelight periodic
     Limelight.periodic();
     String poseString = getPose().toString();
     SmartDashboard.putString("CurrentPose", poseString);
-   
-
-   if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-      if (LimelightHelpers.getTV("limelight-one")) {
-        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-one").pose,
-            Timer.getFPGATimestamp());
-      }
-      if (LimelightHelpers.getTV("limelight-two")) {
-        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-two").pose,
-            Timer.getFPGATimestamp());
-      }
-    } else if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
-      if (LimelightHelpers.getTV("limelight-one")) {
-        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-one").pose,
-            Timer.getFPGATimestamp());
-      }
-      if (LimelightHelpers.getTV("limelight-two")) {
-        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-two").pose,
-            Timer.getFPGATimestamp());
-      }
-    }
-    limelightOnePose = LimelightHelpers.getBotPose3d("limelight-one");
-    limelightTwoPose = LimelightHelpers.getBotPose3d("limelight-two");
+    addVisionMeasurement("limelight-one");
+    addVisionMeasurement("limelight-two");
+    limelightOnePose = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-one").toPose3d();
+    limelightTwoPose = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-two").toPose3d();
     robotPose = poseEstimator.getEstimatedPosition();
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
-    for (var module : modules) {
+    for (var module : modules)  {
       module.periodic();
     }
     odometryLock.unlock();

@@ -27,7 +27,6 @@ import java.util.Queue;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
-
   private final Pigeon2 pigeon =
       new Pigeon2(
           TunerConstants.DrivetrainConstants.Pigeon2Id,
@@ -49,6 +48,13 @@ public class GyroIOPigeon2 implements GyroIO {
   public Pigeon2 getPigeon2() {
     return pigeon;
   }
+  public Rotation2d getYaw() {
+    return Rotation2d.fromDegrees(yaw.getValueAsDouble());
+  }
+  public double getYawVelocityDegreesPerSec() {
+    return yawVelocity.getValueAsDouble();
+  }
+
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {

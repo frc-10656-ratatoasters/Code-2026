@@ -388,11 +388,12 @@ public class LimelightHelpers {
     public Pose3d getBotPose3d() {
       return toPose3D(botpose);
     }
-
-    public Pose3d getBotPose3d_wpiRed() {
+    /* 
+    public Pose3d 3d_wpiRed() {
       return toPose3D(botpose_wpired);
     }
-
+      //were not supposed to use wpiRed and it was erroring so...
+   */
     public Pose3d getBotPose3d_wpiBlue() {
       return toPose3D(botpose_wpiblue);
     }
@@ -554,6 +555,10 @@ public class LimelightHelpers {
       this.avgTagArea = avgTagArea;
       this.rawFiducials = rawFiducials;
       this.isMegaTag2 = isMegaTag2;
+    }
+    //might edit later to add other data like z, roll, pitch, etc. Basically just so its pretty in advantagescope
+    public Pose3d toPose3d(){
+      return new Pose3d(this.pose);
     }
   }
 
@@ -1308,7 +1313,7 @@ public class LimelightHelpers {
    * @param limelightName
    * @return
    */
-  public static PoseEstimate getBotPoseEstimate_wpiBlue_MegaTag2(String limelightName) {
+  public static PoseEstimate MegaTag2getBotPoseEstimate_wpiBlue_(String limelightName) {
     return getBotPoseEstimate(limelightName, "botpose_orb_wpiblue", true);
   }
 
