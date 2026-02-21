@@ -206,15 +206,15 @@ public class Drive extends SubsystemBase {
     if(Math.abs(gyroIO.getYawVelocityDegreesPerSec()) > 360){
       doRejectUpdate = true;
     }
-    if(limelightOneMt2.tagCount == 0 && limelightTwoMt2.tagCount == 0){
+    if(limelightOneMt2 != null && limelightOneMt2.tagCount == 0 && limelightTwoMt2.tagCount == 0){
       doRejectUpdate = true;
     }
     if(!doRejectUpdate){
-      if (limelightOneMt2.tagCount > 0) {
+      if (limelightOneMt2 != null && limelightOneMt2.tagCount > 0) {
         poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));//idk what this is its in limelight docs
         poseEstimator.addVisionMeasurement(limelightOneMt2.pose, limelightOneMt2.timestampSeconds);
       }
-      if (limelightTwoMt2.tagCount > 0) {
+      if (limelightTwoMt2 != null && limelightTwoMt2.tagCount > 0) {
         poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));//idk what this is its in limelight docs
         poseEstimator.addVisionMeasurement(limelightTwoMt2.pose, limelightTwoMt2.timestampSeconds);
       }

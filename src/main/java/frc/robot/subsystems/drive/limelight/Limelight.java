@@ -12,14 +12,14 @@ public class Limelight {
   private static String IdsTwo = "";
   public static void periodic() {
     
-    LimelightHelpers.RawFiducial[] fiducialsOne = LimelightHelpers.getRawFiducials("limelight-one");
-    LimelightHelpers.RawFiducial[] fiducialsTwo = LimelightHelpers.getRawFiducials("limelight-two");
-     for (LimelightHelpers.RawFiducial f : fiducialsOne) {
-    Limelight.IdsOne = IdsOne + " " + f.id;
-    }
-     for (LimelightHelpers.RawFiducial f : fiducialsTwo) {
-      IdsTwo = IdsTwo + " " + f.id;
-    }
+    // LimelightHelpers.RawFiducial[] fiducialsOne = LimelightHelpers.getRawFiducials("limelight-one");
+    // LimelightHelpers.RawFiducial[] fiducialsTwo = LimelightHelpers.getRawFiducials("limelight-two");
+    //  for (LimelightHelpers.RawFiducial f : fiducialsOne) {
+    // Limelight.IdsOne = IdsOne + " " + f.id;
+    // }
+    //  for (LimelightHelpers.RawFiducial f : fiducialsTwo) {
+    //   IdsTwo = IdsTwo + " " + f.id;
+    // }
 
     
   }
