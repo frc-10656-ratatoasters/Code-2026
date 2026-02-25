@@ -17,8 +17,8 @@ public class Intake extends SubsystemBase {
   public Intake () {
     // Constructor for the Intake subsystem
     // Initialize components here
-    intakeMotor = new TalonFX(55);//change
-    armMotor = new TalonFX(56);//CHANGE and make sure its not something else
+    intakeMotor = new TalonFX(51);
+    armMotor = new TalonFX(52);
   }
 
   @Override
@@ -83,7 +83,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void setIntakeSpeed(int speed) {// BE CAREFUL doesnt put in limits and stuff
-    intakeMotor.set(-speed); // may have to reverse
+    intakeMotor.set(-speed); //dont remember why its backwards but scared to change it
   }
 
   public void retractArm(){
