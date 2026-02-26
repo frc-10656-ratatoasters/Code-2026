@@ -37,8 +37,8 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.Climber.Climber;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -52,7 +52,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Intake intake;
-  private final Hopper hopper = new Hopper();
+  private final Climber climber;
   // Controller
   public final CommandXboxController DriveController = new CommandXboxController(0);
   public final CommandXboxController OperatorController = new CommandXboxController(1);
@@ -64,8 +64,6 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
-
-  
 
     switch (Constants.currentMode) {
       case REAL:
@@ -104,6 +102,7 @@ public class RobotContainer {
 
     
     intake = new Intake();
+    climber = new Climber();
     // this is the template auto chooser stuff, we are using pathplanner auto chooser now
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -125,10 +124,6 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     
-    autoChooser.addOption("goToTowerRight", DriveCommands.goToTowerRight(drive));
-    autoChooser.addOption("goToTowerLeft", DriveCommands.goToTowerLeft(drive));
-
-
         //making a new auton chooser
     //public static SendableChooser<Command> mainAutoChooser = AutoBuilder.buildAutoChooser();
 
@@ -163,17 +158,16 @@ public class RobotContainer {
                 () -> -DriveController.getLeftX(),
                 () -> new Rotation2d()));
 
-    OperatorController.leftTrigger(.1).whileTrue(intake.IntakeCommand()); // left trigger is outake
-    OperatorController.rightTrigger().whileTrue(intake.OuttakeCommand()); // left bumper in intake
-    OperatorController.leftBumper().whileTrue(intake.extendArmCommand());
-    OperatorController.rightBumper().whileTrue(intake.retractArmCommand());
-    OperatorController.rightTrigger(.1).whileTrue(hopper.setAgitatorSpeedCommand(-1));//MIGHT BE BACKWARDS
-    OperatorController.rightTrigger(.1).whileFalse(hopper.setAgitatorSpeedCommand(1));
-    DriveController.x().onTrue(DriveCommands.goToTowerLeft(drive));
-    DriveController.b().onTrue(DriveCommands.goToTowerRight(drive));
-    //controller.y().whileTrue(elevator.setElevatorSpeedCommand(1)); // y is raise elevator
-
-    //controller.a().whileTrue(elevator.setElevatorSpeedCommand(-1)); // a is lower elevator
+    OperatorController.rightTrigger(.1).whileTrue(intake.IntakeCommand()); // left trigger is outake
+    OperatorController.leftTrigger().whileTrue(intake.OuttakeCommand()); // left bumper in intake
+    OperatorController.rightBumper().whileTrue(intake.extendArmCommand());
+    OperatorController.leftBumper().whileTrue(intake.retractArmCommand());
+    OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
+    OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
+    OperatorController.y().onTrue(climber.ClimbCommand());
+    OperatorController.a().onTrue(climber.HoldClimbCommand());
+//making namedcommands we can use in pathplanner
+   
 
     // Switch to X pattern when X button is pressed
     //DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive)); //was in the template
