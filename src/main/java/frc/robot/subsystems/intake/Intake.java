@@ -1,5 +1,9 @@
 package frc.robot.subsystems.intake;
 
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
+
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,6 +18,8 @@ public class Intake extends SubsystemBase {
   private final TalonFX armMotor;
   private final double armTopLimit = 0;//make sure zero is arm up, or adjust later
   private final double armBottomLimit = 0.125;// in rotations, ADJUST LATER
+  private final CANcoder armCANcoder = new CANcoder(54);
+  private double armPosition = 0;
   public Intake () {
     // Constructor for the Intake subsystem
     // Initialize components here
@@ -21,8 +27,14 @@ public class Intake extends SubsystemBase {
     armMotor = new TalonFX(52);
   }
 
+  @AutoLogOutput
+  private void updateArmPosition(){//having a method for this feels excessive but its the only way i can figure out to log arm position
+    armPosition  = armCANcoder.getPosition().getValueAsDouble();//idk what unit... figure out
+  }
+
   @Override
   public void periodic() {
+    updateArmPosition();
 // Tells what state the intake is at
     if(intakeState == "intake"){
       intake();
@@ -87,7 +99,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void retractArm(){
-    if(armMotor.getPosition().getValueAsDouble() > armTopLimit){
+    if(armCANcoder.getPosition().getValueAsDouble() > armTopLimit){
         armMotor.set(-0.3);
         } 
     else {
@@ -95,7 +107,7 @@ public class Intake extends SubsystemBase {
         }
     }
     public void extendArm(){
-      if(armMotor.getPosition().getValueAsDouble() < armBottomLimit){
+      if(armCANcoder.getPosition().getValueAsDouble() < armBottomLimit){
           armMotor.set(0.3);
           } 
       else {
