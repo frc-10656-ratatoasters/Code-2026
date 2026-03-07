@@ -4,6 +4,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.hardware.CANcoder;
 
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.ctre.phoenix6.controls.Follower;
@@ -14,44 +17,49 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
   // Add any necessary motor controllers, sensors, or other components here
-  private final TalonFX leadElevatorMotor;
-  private final TalonFX followerElevatorMotor;
-  private final double power = .1;//TEST ON GROUND FIRST probably waaaay to low, adjust later
+  private final TalonFX leadClimbMotor;
+  private final TalonFX followerClimbMotor;
+  private final double climbSpeed = .5;//from -1 to 1, might have to reverse
   private String climberState = "neutral";
-  private final CANcoder hangEncoder;
-  private double hangPosition = 0;
-  //private final double hangTopLimit = 0.9;
-  //private final double hangBottomLimit = 0.2;
-  @AutoLogOutput
-  private void updateHangPosition(){
-    hangPosition = hangEncoder.getPosition().getValueAsDouble();
-  }
+  private final CANcoder climberEncoder;
+  private final double climbTopLimit = 0.9;
+  private final double climbBottomLimit = 0.2;
+
   public Climber() {
     // Constructor for the Climber subsystem
     // Initialize components here
-    leadElevatorMotor = new TalonFX(57); //change canID
-    followerElevatorMotor = new TalonFX(58); //change canID later
-    followerElevatorMotor.setControl(new Follower (10,MotorAlignmentValue.Aligned));
-    hangEncoder = new CANcoder(60);//maybe 60s can be hang stuff
+    leadClimbMotor = new TalonFX(57); //change canID
+    followerClimbMotor = new TalonFX(58); //change canID later
+    followerClimbMotor.setControl(new Follower (10,MotorAlignmentValue.Aligned));
+    climberEncoder = new CANcoder(60);//maybe 60s can be climb stuff
     //may have to invert??
-   //followerElevatorMotor.setControlMode(ControlModeValue.Follower, leadElevatorMotor.getDeviceID());
+   //followerClimbMotor.setControlMode(ControlModeValue.Follower, leadClimbMotor.getDeviceID());
        //makes it brake when off, so it doesnt fall off
-    leadElevatorMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
-    followerElevatorMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+    leadClimbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+    followerClimbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
   }
-
+  @AutoLogOutput
+  private String logClimberState(){//feels excessive but the only way I can figure out to log it
+    return climberState;
+  }
   @Override
   public void periodic() {
-    updateHangPosition();
+    logClimberState();
     // This method will be called once per scheduler run
-    if(climberState == "climb"){
-      
+    if(climberState == "climb"&& climberEncoder.getPosition().getValueAsDouble() < climbTopLimit){// if "top" is in climb position will have to fix
+      leadClimbMotor.set(climbSpeed);
     }
     else if(climberState == "hold"){
-      stopClimber();
+      leadClimbMotor.stopMotor();//idk the difference from set(0)
     }
-    else if (climberState == "neutral"){
-      leadElevatorMotor.set(0);
+    else if (climberState == "neutral" && climberEncoder.getPosition().getValueAsDouble() > climbBottomLimit ){
+      leadClimbMotor.set(-.5);
+     }
+     else if(climberState == "forewards"){
+      leadClimbMotor.set(climbSpeed);
+     }
+     else if(climberState == "backwards"){
+      leadClimbMotor.set(-.5);
      }
      
     // This method will be called once per scheduler run
@@ -64,16 +72,15 @@ public class Climber extends SubsystemBase {
     climberState = "climb";
     }
    
-
 //prob should make command
   public void stopClimber() {
     // Code to stop the climber mechanism
     //probably does some sort of locking thing so it doeesnt fall off? idk
-    leadElevatorMotor.stopMotor();
+    leadClimbMotor.stopMotor();
     climberState = "hold";
   }
 
-  public Command ClimbCommand(){
+  public Command ClimbCommand(){//so theoretically this works as climbL1 command cause it stops in periodic at the limit... TEST
     return new InstantCommand(
         () -> {
             climberState = "climb";
@@ -89,10 +96,24 @@ public class Climber extends SubsystemBase {
         },
         this);
   }
-
-  public void autoClimbL1(double power){
-    leadElevatorMotor.set(power);
-      leadElevatorMotor.stopMotor();
+  public void climberForewardsOnGround(){//ONLY USE ON GROUND should prob remove before comp. no safe limits.
+    climberState = "forewards";
   }
-
+  public void climberBackwardsOnGround(){//again only on ground
+    climberState = "backwards";
+  }
+  public Command joystickClimbCommand(DoubleSupplier speed, DoubleSupplier voltage){//its one method so we can set it to default
+    return new InstantCommand(
+      () -> {
+        if(speed.getAsDouble()== 0 && voltage.getAsDouble() == 0){
+          leadClimbMotor.stopMotor();
+        }
+        else{
+          climberState = "manual";
+          leadClimbMotor.set(speed.getAsDouble());
+          leadClimbMotor.set(voltage.getAsDouble()*12);// gotta translate voltage to -12 to 12
+        }
+      }, this
+    );
+  }
 }

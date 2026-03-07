@@ -148,6 +148,13 @@ public class RobotContainer {
             () -> -DriveController.getLeftX(),
             () -> -DriveController.getRightX()));
 
+    climber.setDefaultCommand(//should remove before comp, its so operator joysticks control climb
+        climber.joystickClimbCommand(
+            () -> - OperatorController.getLeftY(),
+            () -> - OperatorController.getRightY()
+        )
+    );
+
     // Lock to 0° when A button is held
     DriveController
         .a()
@@ -164,8 +171,19 @@ public class RobotContainer {
     OperatorController.leftBumper().whileTrue(intake.retractArmCommand());
     OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
     OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
-    OperatorController.y().onTrue(climber.ClimbCommand());
+    OperatorController.y().onTrue(climber.ClimbCommand());//includes safe limit
     OperatorController.a().onTrue(climber.HoldClimbCommand());
+
+
+
+
+
+
+
+
+
+
+
     
 //making namedcommands we can use in pathplanner
    
