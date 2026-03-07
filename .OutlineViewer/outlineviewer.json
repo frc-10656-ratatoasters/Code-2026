@@ -12,6 +12,9 @@
   "Server": {
     "open": true
   },
+  "limelight-two@2": {
+    "open": true
+  },
   "transitory": {
     "CameraPublisher": {
       "open": true

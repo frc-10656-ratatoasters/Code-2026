@@ -59,6 +59,8 @@ import frc.robot.util.LocalADStarAK;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -199,14 +201,12 @@ public class Drive extends SubsystemBase {
       LimelightHelpers.SetIMUMode("limelight-two",4 );
     }
 
-
-
     LimelightHelpers.PoseEstimate limelightOneMt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-one");
     LimelightHelpers.PoseEstimate limelightTwoMt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-two");
     if(Math.abs(gyroIO.getYawVelocityDegreesPerSec()) > 360){
       doRejectUpdate = true;
     }
-    if(limelightOneMt2 != null && limelightOneMt2.tagCount == 0 && limelightTwoMt2.tagCount == 0){
+    if(limelightTwoMt2 != null && limelightOneMt2 != null && limelightOneMt2.tagCount == 0 && limelightTwoMt2.tagCount == 0){
       doRejectUpdate = true;
     }
     if(!doRejectUpdate){

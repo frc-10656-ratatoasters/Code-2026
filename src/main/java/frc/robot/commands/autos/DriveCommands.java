@@ -17,7 +17,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -28,7 +30,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -37,24 +41,59 @@ import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static final double ANGLE_KP = 5.0;
+  private static final double ANGLE_KP = .8;
   private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
+  private static final double DRIVE_MAX_VELOCITY = 10;//PROBABLY WRONG CHANGE!!!
+  private static final double DRIVE_MAX_ACCELERATION = 20;//ALSO WRONG
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
-  // should adjust later!
-  private static final double DRIVE_KP = .002;
+    // should adjust later!
+  private static final double DRIVE_KP = .3;
   private static final double DRIVE_KI = 0.0;
   private static final double DRIVE_KD = 0.0;
 
   private DriveCommands() {
   }
+  //@AutoLogOutput(key = "goToTowerGoal")
+  private static Pose2d lastTowerGoal = new Pose2d();
 
+  private static Pose2d getTowerPose(String side) {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    Pose2d pose = new Pose2d();
+
+    if (!alliance.isPresent()) {
+      System.out.println("goToTower failed, no alliance");
+    } else if (alliance.get() == Alliance.Red) {
+      if ("left".equals(side)) {
+        pose = new Pose2d(15, 4.64, new Rotation2d(0.0));
+      } else if ("right".equals(side)) {
+        pose = new Pose2d(15, 3.14, new Rotation2d(0.0));
+      } else {
+        System.out.println("goToTower failed, side invalid");
+      }
+    } else if (alliance.get() == Alliance.Blue) {
+      if ("left".equals(side)) {
+        pose = new Pose2d(.85, 4.64, new Rotation2d(Math.PI));
+      } else if ("right".equals(side)) {
+        pose = new Pose2d(.85, 3.14, new Rotation2d(Math.PI));
+      } else {
+        System.out.println("goToTower failed, side invalid");
+      }
+    }
+
+    lastTowerGoal = pose;
+    return pose;
+  }
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
@@ -293,51 +332,40 @@ public class DriveCommands {
   }
 
   public static class goToTowerRightCommand extends Command {
-    double[] setpointX = { 4.00 }; //should change later
-    double[] setpointY = { 2.0 }; //should change later
-    double[] setpointRotation = { 0.0 };
     ProfiledPIDController anglePIDController;
-    Optional<Alliance> ally = DriverStation.getAlliance();
     Drive drive;
     ProfiledPIDController xPIDController;
     ProfiledPIDController yPIDController;
-
+    Pose2d TargetPose = getTowerPose("right");
     goToTowerRightCommand(Drive drive) {
       this.drive = drive;
       addRequirements(drive);
     }
-
     @Override
     public void initialize() {
-      if (ally.isPresent()) {
-        if (ally.get() == Alliance.Blue) {
-          setpointY[0] = 5.0; //should change later
-          setpointX[0] = 14.0; //should change later
-          setpointRotation[0] = 180.0;
-        }
-      } else {
-        System.out.println("Alliance is nothing for some reason???????? ");
-      }
       anglePIDController = new ProfiledPIDController(
           ANGLE_KP,
           0.0,
           ANGLE_KD,
           new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-      xPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KP, DRIVE_KD, null);
-      yPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, null);
+      xPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KP, DRIVE_KD, 
+      new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
+      yPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, 
+      new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
     }
 
     @Override
     public void execute() {
       double angleOutput = anglePIDController.calculate(
           drive.getPoseEstimator().getEstimatedPosition().getRotation().getDegrees(),
-          setpointRotation[0]);
+          TargetPose.getRotation().getDegrees());
       double xOutput = xPIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getX(), setpointX[0]);
+          drive.getPoseEstimator().getEstimatedPosition().getX(), TargetPose.getRotation().getDegrees());
       double yOutput = yPIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getY(), setpointY[0]);
+          drive.getPoseEstimator().getEstimatedPosition().getY(), TargetPose.getRotation().getDegrees());
       ChassisSpeeds speeds = new ChassisSpeeds(xOutput, yOutput, Units.degreesToRadians(angleOutput));
       drive.runVelocity(speeds);
+      Logger.recordOutput("GoToTower",TargetPose );
     }
 
     @Override
@@ -347,15 +375,11 @@ public class DriveCommands {
   }
 
   public static class goToTowerLeftCommand extends Command {
-    double[] setpointX = { 6.0 }; //should change later
-    double[] setpointY = { 2.0 }; //should change later
-    double[] setpointRotation = { 0.0 };
-    Optional<Alliance> ally = DriverStation.getAlliance();
     ProfiledPIDController anglePIDController;
     ProfiledPIDController xPIDController;
     ProfiledPIDController yPIDController;
     Drive drive;
-
+    Pose2d TargetPose = getTowerPose("left");
     goToTowerLeftCommand(Drive drive) {
       this.drive = drive;
       addRequirements(drive);
@@ -363,35 +387,29 @@ public class DriveCommands {
 
     @Override
     public void initialize() {
-      if (ally.isPresent()) {
-        if (ally.get() == Alliance.Blue) {
-          setpointY[0] = 2.0; //should change later
-          setpointX[0] = 14.0; //should change later
-          setpointRotation[0] = 180.0;
-        }
-      } else {
-        System.out.println("Alliance is nothing for some reason???????? ");
-      }
       anglePIDController = new ProfiledPIDController(
           ANGLE_KP,
           0.0,
           ANGLE_KD,
           new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-      xPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KP, DRIVE_KD, null);
-      yPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, null);
+      xPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KP, DRIVE_KD, 
+      new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
+      yPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, 
+      new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
     }
 
     @Override
     public void execute() {
       double angleOutput = anglePIDController.calculate(
           drive.getPoseEstimator().getEstimatedPosition().getRotation().getDegrees(),
-          setpointRotation[0]);
+          TargetPose.getRotation().getDegrees());
       double xOutput = xPIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getX(), setpointX[0]);
+          drive.getPoseEstimator().getEstimatedPosition().getX(), TargetPose.getRotation().getDegrees());
       double yOutput = yPIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getY(), setpointY[0]);
+          drive.getPoseEstimator().getEstimatedPosition().getY(), TargetPose.getRotation().getDegrees());
       ChassisSpeeds speeds = new ChassisSpeeds(xOutput, yOutput, Units.degreesToRadians(angleOutput));
       drive.runVelocity(speeds);
+      Logger.recordOutput("goToTower goal", TargetPose);
     }
 
     @Override
