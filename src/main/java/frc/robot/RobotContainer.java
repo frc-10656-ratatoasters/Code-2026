@@ -43,174 +43,177 @@ import frc.robot.subsystems.Climber.Climber;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // Subsystems
-  private final Drive drive;
-  private final Intake intake;
-  private final Climber climber;
-  // Controller
-  public final CommandXboxController DriveController = new CommandXboxController(0);
-  public final CommandXboxController OperatorController = new CommandXboxController(1);
+    // Subsystems
+    private final Drive drive;
+    private final Intake intake;
+    private final Climber climber;
+    // Controller
+    public final CommandXboxController DriveController = new CommandXboxController(0);
+    public final CommandXboxController OperatorController = new CommandXboxController(1);
 
-  // Dashboard inputs
- // public final LoggedDashboardChooser<Command> autoChooser;//the template version
- private final LoggedDashboardChooser<Command> autoChooser; //pathplanner docs version
+    // Dashboard inputs
+    // public final LoggedDashboardChooser<Command> autoChooser;//the template
+    // version
+    private final LoggedDashboardChooser<Command> autoChooser; // pathplanner docs version
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() 
-  {
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
 
-    switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
-        break;
+        switch (Constants.currentMode) {
+            case REAL:
+                // Real robot, instantiate hardware IO implementations
+                drive = new Drive(
+                        new GyroIOPigeon2(),
+                        new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                        new ModuleIOTalonFX(TunerConstants.FrontRight),
+                        new ModuleIOTalonFX(TunerConstants.BackLeft),
+                        new ModuleIOTalonFX(TunerConstants.BackRight));
+                break;
 
-      case SIM:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
-        break;
+            case SIM:
+                // Sim robot, instantiate physics sim IO implementations
+                drive = new Drive(
+                        new GyroIO() {
+                        },
+                        new ModuleIOSim(TunerConstants.FrontLeft),
+                        new ModuleIOSim(TunerConstants.FrontRight),
+                        new ModuleIOSim(TunerConstants.BackLeft),
+                        new ModuleIOSim(TunerConstants.BackRight));
+                break;
 
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        break;
+            default:
+                // Replayed robot, disable IO implementations
+                drive = new Drive(
+                        new GyroIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        });
+                break;
+        }
+
+        intake = new Intake();
+        climber = new Climber();
+        // this is the template auto chooser stuff, we are using pathplanner auto
+        // chooser now
+        // Set up auto routines
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+        // Set up SysId routines
+        autoChooser.addOption(
+                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+        autoChooser.addOption(
+                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+        autoChooser.addOption(
+                "Drive SysId (Quasistatic Forward)",
+                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        autoChooser.addOption(
+                "Drive SysId (Quasistatic Reverse)",
+                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        autoChooser.addOption(
+                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        autoChooser.addOption(
+                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+        // making a new auton chooser
+        // public static SendableChooser<Command> mainAutoChooser =
+        // AutoBuilder.buildAutoChooser();
+
+        // SmartDashboard.putData("Auto Chooser", mainAutoChooser);
+
+        // Configure the button bindings
+        configureButtonBindings();
     }
 
-    
-    intake = new Intake();
-    climber = new Climber();
-    // this is the template auto chooser stuff, we are using pathplanner auto chooser now
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    /**
+     * Use this method to define your button->command mappings. Buttons can be
+     * created by
+     * instantiating a {@link GenericHID} or one of its subclasses ({@link
+     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+     * it to a {@link
+     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+    private void configureButtonBindings() {
+        // Default command, normal field-relative drive
+        drive.setDefaultCommand(
+                DriveCommands.joystickDrive(
+                        drive,
+                        () -> -DriveController.getLeftY(),
+                        () -> -DriveController.getLeftX(),
+                        () -> -DriveController.getRightX()));
 
+        climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
+                climber.joystickClimbCommand(
+                        () -> -OperatorController.getLeftY(),
+                        climber));
+        intake.setDefaultCommand(
+                intake.setIntakeSpeed(
+                        () -> -OperatorController.getRightY(),
+                        intake));
 
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    
-        //making a new auton chooser
-    //public static SendableChooser<Command> mainAutoChooser = AutoBuilder.buildAutoChooser();
+        // Lock to 0° when A button is held
+        DriveController
+                .a()
+                .whileTrue(
+                        DriveCommands.joystickDriveAtAngle(
+                                drive,
+                                () -> -DriveController.getLeftY(),
+                                () -> -DriveController.getLeftX(),
+                                () -> new Rotation2d()));
 
-    //SmartDashboard.putData("Auto Chooser", mainAutoChooser);
+        OperatorController.rightTrigger(.1).whileTrue(intake.IntakeCommand()); // left trigger is outake
+        OperatorController.leftTrigger().whileTrue(intake.OuttakeCommand()); // left bumper in intake
+        OperatorController.rightBumper().whileTrue(intake.extendArmCommand());
+        OperatorController.leftBumper().whileTrue(intake.retractArmCommand());
+        OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
+        OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
+        OperatorController.y().onTrue(climber.ClimbCommand());// includes safe limit
+        OperatorController.a().onTrue(climber.HoldClimbCommand());
+        DriveController.leftTrigger().whileTrue(climber.ClimbCommand());
+        DriveController.rightTrigger().whileTrue(climber.descendClimbCommand());
 
-    // Configure the button bindings
-    configureButtonBindings();
-  }
+        NamedCommands.registerCommand("climb L1", climber.ClimbCommand());
+        NamedCommands.registerCommand("start intake", intake.IntakeCommand());
+        NamedCommands.registerCommand("stop intake", intake.stopIntakeCommand());
+        // Switch to X pattern when X button is pressed
+        // DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive)); //was
+        // in the template
+        DriveController.y().onTrue(Commands.runOnce(drive::zeroGyro, drive));
+        // Reset gyro to 0° when B button is pressed
+        DriveController
+                .b()
+                .onTrue(
+                        Commands.runOnce(
+                                () -> drive.setPose(
+                                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                                drive)
+                                .ignoringDisable(true));
+    }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -DriveController.getLeftY(),
-            () -> -DriveController.getLeftX(),
-            () -> -DriveController.getRightX()));
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
 
-    climber.setDefaultCommand(//should remove before comp, its so operator joysticks control climb
-        climber.joystickClimbCommand(
-            () -> - OperatorController.getLeftY(),
-            () -> - OperatorController.getRightY()
-        )
-    );
-
-    // Lock to 0° when A button is held
-    DriveController
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -DriveController.getLeftY(),
-                () -> -DriveController.getLeftX(),
-                () -> new Rotation2d()));
-
-    OperatorController.rightTrigger(.1).whileTrue(intake.IntakeCommand()); // left trigger is outake
-    OperatorController.leftTrigger().whileTrue(intake.OuttakeCommand()); // left bumper in intake
-    OperatorController.rightBumper().whileTrue(intake.extendArmCommand());
-    OperatorController.leftBumper().whileTrue(intake.retractArmCommand());
-    OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
-    OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
-    OperatorController.y().onTrue(climber.ClimbCommand());//includes safe limit
-    OperatorController.a().onTrue(climber.HoldClimbCommand());
-
-
-
-
-
-
-
-
-
-
-
-    
-//making namedcommands we can use in pathplanner
-   
-
-    // Switch to X pattern when X button is pressed
-    //DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive)); //was in the template
-    DriveController.y().onTrue(Commands.runOnce(drive::zeroGyro, drive));
-    // Reset gyro to 0° when B button is pressed
-    DriveController
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
-  }
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-
-  public Command getAutonomousCommand() {
-    return autoChooser.get();
-  }
+    public Command getAutonomousCommand() {
+        return autoChooser.get();
+    }
 
 }

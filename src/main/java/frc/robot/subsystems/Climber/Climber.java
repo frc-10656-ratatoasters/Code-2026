@@ -17,103 +17,100 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
   // Add any necessary motor controllers, sensors, or other components here
-  private final TalonFX leadClimbMotor;
+  public final TalonFX leadClimbMotor;
   private final TalonFX followerClimbMotor;
-  private final double climbSpeed = .5;//from -1 to 1, might have to reverse
-  private String climberState = "neutral";
-  private final CANcoder climberEncoder;
+  private final double climbSpeed = .5;// from -1 to 1, might have to reverse
+  public String climberState = "hold";
+  public final CANcoder climberEncoder;
   private final double climbTopLimit = 0.9;
   private final double climbBottomLimit = 0.2;
 
   public Climber() {
     // Constructor for the Climber subsystem
     // Initialize components here
-    leadClimbMotor = new TalonFX(57); //change canID
-    followerClimbMotor = new TalonFX(58); //change canID later
-    followerClimbMotor.setControl(new Follower (10,MotorAlignmentValue.Aligned));
-    climberEncoder = new CANcoder(60);//maybe 60s can be climb stuff
-    //may have to invert??
-   //followerClimbMotor.setControlMode(ControlModeValue.Follower, leadClimbMotor.getDeviceID());
-       //makes it brake when off, so it doesnt fall off
+    leadClimbMotor = new TalonFX(57); // change canID
+    followerClimbMotor = new TalonFX(58); // change canID later
+    followerClimbMotor.setControl(new Follower(10, MotorAlignmentValue.Aligned));
+    climberEncoder = new CANcoder(60);// maybe 60s can be climb stuff
+    // may have to invert??
+    // followerClimbMotor.setControlMode(ControlModeValue.Follower,
+    // leadClimbMotor.getDeviceID());
+    // makes it brake when off, so it doesnt fall off
     leadClimbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
     followerClimbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
   }
+
   @AutoLogOutput
-  private String logClimberState(){//feels excessive but the only way I can figure out to log it
+  private String logClimberState() {// feels excessive but the only way I can figure out to log it
     return climberState;
   }
+
   @Override
   public void periodic() {
-    logClimberState();
+    //logClimberState();//uncomment once motors on
     // This method will be called once per scheduler run
-    if(climberState == "climb"&& climberEncoder.getPosition().getValueAsDouble() < climbTopLimit){// if "top" is in climb position will have to fix
+    if (climberState == "climb" && climberEncoder.getPosition().getValueAsDouble() < climbTopLimit) {
       leadClimbMotor.set(climbSpeed);
-    }
-    else if(climberState == "hold"){
-      leadClimbMotor.stopMotor();//idk the difference from set(0)
-    }
-    else if (climberState == "neutral" && climberEncoder.getPosition().getValueAsDouble() > climbBottomLimit ){
+    } else if (climberState == "hold") {
+      leadClimbMotor.stopMotor();// idk the difference from set(0)
+    } else if (climberState == "descend" && climberEncoder.getPosition().getValueAsDouble() > climbBottomLimit) {
       leadClimbMotor.set(-.5);
-     }
-     else if(climberState == "forewards"){
-      leadClimbMotor.set(climbSpeed);
-     }
-     else if(climberState == "backwards"){
-      leadClimbMotor.set(-.5);
-     }
-     
+    }
+
     // This method will be called once per scheduler run
   }
-  
 
   // Add methods to control the climber subsystem
   public void startClimber() {
     // Code to start the climber mechanism
     climberState = "climb";
-    }
-   
-//prob should make command
+  }
+
+  // prob should make command
   public void stopClimber() {
     // Code to stop the climber mechanism
-    //probably does some sort of locking thing so it doeesnt fall off? idk
+    // probably does some sort of locking thing so it doeesnt fall off? idk
     leadClimbMotor.stopMotor();
     climberState = "hold";
   }
 
-  public Command ClimbCommand(){//so theoretically this works as climbL1 command cause it stops in periodic at the limit... TEST
+  public Command ClimbCommand() {// so theoretically this works as climbL1 command cause it stops in periodic at
+                                 // the limit... TEST
     return new InstantCommand(
         () -> {
-            climberState = "climb";
+          climberState = "climb";
         },
         this);
-  
+
   }
 
-  public Command HoldClimbCommand(){
+  public Command HoldClimbCommand() {
     return new InstantCommand(
         () -> {
-            climberState = "hold";
+          climberState = "hold";
         },
         this);
   }
-  public void climberForewardsOnGround(){//ONLY USE ON GROUND should prob remove before comp. no safe limits.
-    climberState = "forewards";
-  }
-  public void climberBackwardsOnGround(){//again only on ground
-    climberState = "backwards";
-  }
-  public Command joystickClimbCommand(DoubleSupplier speed, DoubleSupplier voltage){//its one method so we can set it to default
+
+  public Command descendClimbCommand() {
     return new InstantCommand(
-      () -> {
-        if(speed.getAsDouble()== 0 && voltage.getAsDouble() == 0){
-          leadClimbMotor.stopMotor();
-        }
-        else{
-          climberState = "manual";
-          leadClimbMotor.set(speed.getAsDouble());
-          leadClimbMotor.set(voltage.getAsDouble()*12);// gotta translate voltage to -12 to 12
-        }
-      }, this
-    );
+        () -> {
+          climberState = "descend";
+        },
+        this);
+  }
+
+  public Command joystickClimbCommand(DoubleSupplier speed, Climber climber){
+    return new InstantCommand(
+        () -> {
+          if (speed.getAsDouble() != 0) {
+            climber.climberState = "manual";
+            climber.leadClimbMotor.set(speed.getAsDouble());
+          } else {
+            if (climber.climberState == "manual") {
+              climber.leadClimbMotor.stopMotor();
+            }
+          }
+        }, this);
   }
 }
