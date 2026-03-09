@@ -98,13 +98,13 @@
     },
     {
       "name": "Outtake",
-      "waypointRelativePos": 3,
+      "waypointRelativePos": 3.0,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
       "name": "Retract Arm",
-      "waypointRelativePos": 3.5,
+      "waypointRelativePos": 3.0,
       "endWaypointRelativePos": null,
       "command": null
     }
