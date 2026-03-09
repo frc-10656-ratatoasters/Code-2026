@@ -11,15 +11,51 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Extend Arm"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake"
+          }
+        },
+        {
           "type": "wait",
           "data": {
             "waitTime": 3.0
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Stop Intake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "ClimbLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "outtake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Retract Arm"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "climb L1"
           }
         }
       ]
