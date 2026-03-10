@@ -52,12 +52,12 @@
         "y": 5.632924393725941
       },
       "prevControl": {
-        "x": 11.716371337807653,
-        "y": 5.728777541366382
+        "x": 10.676380385115053,
+        "y": 5.750588011785878
       },
       "nextControl": {
-        "x": 9.149828815970857,
-        "y": 5.257703281021466
+        "x": 13.176542168674702,
+        "y": 5.182409638554216
       },
       "isLocked": false,
       "linkedName": null
@@ -84,7 +84,32 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Extend Arm",
+      "waypointRelativePos": 0.7702233250620342,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Intake",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Stop Intake",
+      "waypointRelativePos": 2.239205955334996,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Outtake",
+      "waypointRelativePos": 4.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -98,7 +123,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "right side",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
