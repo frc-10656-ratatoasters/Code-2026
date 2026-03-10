@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IntakeRed"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Outake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Retract Arm"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ClimbRedLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "climb L1"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Red Autos",
+  "choreoAuto": false
+}
