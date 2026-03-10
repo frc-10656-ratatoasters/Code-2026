@@ -39,6 +39,8 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.hopper.HopperDistanceSensor;
+import frc.robot.subsystems.hopper.Hopper;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -56,6 +58,8 @@ public class RobotContainer {
     private final Drive drive;
     private final Intake intake;
     private final Climber climber;
+    private final HopperDistanceSensor hopperDistanceSensor;
+
     // Controller
     public final CommandXboxController DriveController = new CommandXboxController(0);
     public final CommandXboxController OperatorController = new CommandXboxController(1);
@@ -110,6 +114,7 @@ public class RobotContainer {
 
         intake = new Intake();
         climber = new Climber();
+        hopperDistanceSensor = new HopperDistanceSensor();
         // this is the template auto chooser stuff, we are using pathplanner auto
         // chooser now
         // Set up auto routines
@@ -135,12 +140,15 @@ public class RobotContainer {
         // public static SendableChooser<Command> mainAutoChooser =
         // AutoBuilder.buildAutoChooser();
 
-        // SmartDashboard.putData("Auto Chooser", mainAutoChooser);
 
         // Configure the button bindings
         configureButtonBindings();
+
+        SmartDashboard.putString("Is Hopper Full?", hopperDistanceSensor.hopperState);
+    
     }
 
+        
     /**
      * Use this method to define your button->command mappings. Buttons can be
      * created by
@@ -164,7 +172,7 @@ public class RobotContainer {
                         climber));
         intake.setDefaultCommand(
                 intake.setIntakeSpeed(
-                        () -> -OperatorController.getRightY(),
+                        () -> -OperatorController.getRightY(),//might have to reverse
                         intake));
 
         // Lock to 0° when A button is held
@@ -176,8 +184,9 @@ public class RobotContainer {
                                 () -> -DriveController.getLeftY(),
                                 () -> -DriveController.getLeftX(),
                                 () -> new Rotation2d()));
-
-        OperatorController.rightTrigger(.1).whileTrue(intake.IntakeCommand()); // left trigger is outake
+        //Setting drive controls
+        OperatorController.rightTrigger(.1).whileTrue(intake.
+        20IntakeCommand()); // left trigger is outake
         OperatorController.leftTrigger().whileTrue(intake.OuttakeCommand()); // left bumper in intake
         OperatorController.rightBumper().whileTrue(intake.extendArmCommand());
         OperatorController.leftBumper().whileTrue(intake.retractArmCommand());
@@ -188,9 +197,14 @@ public class RobotContainer {
         DriveController.leftTrigger().whileTrue(climber.ClimbCommand());
         DriveController.rightTrigger().whileTrue(climber.descendClimbCommand());
 
+        //registering commands for Pathplanner
         NamedCommands.registerCommand("climb L1", climber.ClimbCommand());
-        NamedCommands.registerCommand("start intake", intake.IntakeCommand());
-        NamedCommands.registerCommand("stop intake", intake.stopIntakeCommand());
+        NamedCommands.registerCommand("Extend Arm", intake.extendArmCommand());
+        NamedCommands.registerCommand("Retract Arm", intake.retractArmCommand());
+        NamedCommands.registerCommand("Start Intake", intake.IntakeCommand());
+        NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
+        NamedCommands.registerCommand("outtake", intake.OuttakeCommand());
+
         // Switch to X pattern when X button is pressed
         // DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive)); //was
         // in the template
