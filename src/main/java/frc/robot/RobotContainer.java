@@ -186,7 +186,7 @@ public class RobotContainer {
                                 () -> new Rotation2d()));
         //Setting drive controls
         OperatorController.rightTrigger(.1).whileTrue(intake.
-        20IntakeCommand()); // left trigger is outake
+        IntakeCommand()); // left trigger is outake
         OperatorController.leftTrigger().whileTrue(intake.OuttakeCommand()); // left bumper in intake
         OperatorController.rightBumper().whileTrue(intake.extendArmCommand());
         OperatorController.leftBumper().whileTrue(intake.retractArmCommand());
