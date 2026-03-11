@@ -51,53 +51,49 @@ public class DriveCommands {
   private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
-  private static final double DRIVE_MAX_VELOCITY = 10;// PROBABLY WRONG CHANGE!!!
-  private static final double DRIVE_MAX_ACCELERATION = 20;// ALSO WRONG
+  private static final double DRIVE_MAX_VELOCITY = 10;//PROBABLY WRONG CHANGE!!!
+  private static final double DRIVE_MAX_ACCELERATION = 20;//ALSO WRONG
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
-  // should adjust later!
+    // should adjust later!
   private static final double DRIVE_KP = .3;
   private static final double DRIVE_KI = 0.0;
   private static final double DRIVE_KD = 0.0;
 
   private DriveCommands() {
   }
-
   @AutoLogOutput(key = "goToTowerGoal")
+  private static Pose2d lastTowerGoal = new Pose2d();
+
   private static Pose2d getTowerPose(String side) {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     Pose2d pose = new Pose2d();
 
     if (!alliance.isPresent()) {
       System.out.println("goToTower failed, no alliance");
-    } 
-    else if (alliance.get() == Alliance.Red) {
+    } else if (alliance.get() == Alliance.Red) {
       if ("left".equals(side)) {
         pose = new Pose2d(15, 4.64, new Rotation2d(0.0));
-      } 
-      else if ("right".equals(side)) {
+      } else if ("right".equals(side)) {
         pose = new Pose2d(15, 3.14, new Rotation2d(0.0));
-      }
-       else {
+      } else {
         System.out.println("goToTower failed, side invalid");
       }
-    } 
-    else if (alliance.get() == Alliance.Blue) {
+    } else if (alliance.get() == Alliance.Blue) {
       if ("left".equals(side)) {
         pose = new Pose2d(.85, 4.64, new Rotation2d(Math.PI));
-      }
-       else if ("right".equals(side)) {
+      } else if ("right".equals(side)) {
         pose = new Pose2d(.85, 3.14, new Rotation2d(Math.PI));
-      } 
-      else {
+      } else {
         System.out.println("goToTower failed, side invalid");
       }
     }
+
+    lastTowerGoal = pose;
     return pose;
   }
-
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
@@ -341,12 +337,10 @@ public class DriveCommands {
     ProfiledPIDController xPIDController;
     ProfiledPIDController yPIDController;
     Pose2d TargetPose = getTowerPose("right");
-
     goToTowerRightCommand(Drive drive) {
       this.drive = drive;
       addRequirements(drive);
     }
-
     @Override
     public void initialize() {
       anglePIDController = new ProfiledPIDController(
@@ -354,22 +348,25 @@ public class DriveCommands {
           0.0,
           ANGLE_KD,
           new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-      xPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KP, DRIVE_KD,
-          new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
-      yPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD,
-          new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
+      // Angle controller expects radians; enable continuous input in [-pi, pi]
+      anglePIDController.enableContinuousInput(-Math.PI, Math.PI);
+      xPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KP, DRIVE_KD, 
+      new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
+      yPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, 
+      new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
     }
 
     @Override
     public void execute() {
       double angleOutput = anglePIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getRotation().getDegrees(),
-          TargetPose.getRotation().getDegrees());
+          drive.getPoseEstimator().getEstimatedPosition().getRotation().getRadians(),
+          TargetPose.getRotation().getRadians());
       double xOutput = xPIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getX(), TargetPose.getRotation().getDegrees());
+          drive.getPoseEstimator().getEstimatedPosition().getX(), TargetPose.getX());
       double yOutput = yPIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getY(), TargetPose.getRotation().getDegrees());
-      ChassisSpeeds speeds = new ChassisSpeeds(xOutput, yOutput, Units.degreesToRadians(angleOutput));
+          drive.getPoseEstimator().getEstimatedPosition().getY(), TargetPose.getY());
+      // angleOutput is in radians (controller input/output in radians/sec), so pass directly
+      ChassisSpeeds speeds = new ChassisSpeeds(xOutput, yOutput, angleOutput);
       drive.runVelocity(speeds);
       Logger.recordOutput("GoToTower", TargetPose);
     }
@@ -386,7 +383,6 @@ public class DriveCommands {
     ProfiledPIDController yPIDController;
     Drive drive;
     Pose2d TargetPose = getTowerPose("left");
-
     goToTowerLeftCommand(Drive drive) {
       this.drive = drive;
       addRequirements(drive);
@@ -399,25 +395,27 @@ public class DriveCommands {
           0.0,
           ANGLE_KD,
           new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-      xPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KP, DRIVE_KD,
-          new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
-      yPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD,
-          new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
+      // Angle controller expects radians; enable continuous input in [-pi, pi]
+      anglePIDController.enableContinuousInput(-Math.PI, Math.PI);
+      xPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KP, DRIVE_KD, 
+      new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
+      yPIDController = new ProfiledPIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, 
+      new TrapezoidProfile.Constraints(DRIVE_MAX_VELOCITY, DRIVE_MAX_ACCELERATION));
     }
 
-    @Override
-    public void execute() {
-      double angleOutput = anglePIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getRotation().getDegrees(),
-          TargetPose.getRotation().getDegrees());
-      double xOutput = xPIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getX(), TargetPose.getRotation().getDegrees());
-      double yOutput = yPIDController.calculate(
-          drive.getPoseEstimator().getEstimatedPosition().getY(), TargetPose.getRotation().getDegrees());
-      ChassisSpeeds speeds = new ChassisSpeeds(xOutput, yOutput, Units.degreesToRadians(angleOutput));
-      drive.runVelocity(speeds);
-      Logger.recordOutput("goToTower goal", TargetPose);
-    }
+  @Override
+  public void execute() {
+    double angleOutput = anglePIDController.calculate(
+      drive.getPoseEstimator().getEstimatedPosition().getRotation().getRadians(),
+      TargetPose.getRotation().getRadians());
+    double xOutput = xPIDController.calculate(
+      drive.getPoseEstimator().getEstimatedPosition().getX(), TargetPose.getX());
+    double yOutput = yPIDController.calculate(
+      drive.getPoseEstimator().getEstimatedPosition().getY(), TargetPose.getY());
+    ChassisSpeeds speeds = new ChassisSpeeds(xOutput, yOutput, angleOutput);
+    drive.runVelocity(speeds);
+    Logger.recordOutput("goToTower goal", TargetPose);
+  }
 
     @Override
     public boolean isFinished() {
