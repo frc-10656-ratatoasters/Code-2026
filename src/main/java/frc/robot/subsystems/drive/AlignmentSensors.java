@@ -5,6 +5,8 @@ import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.signals.UpdateModeValue;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -12,9 +14,9 @@ public class AlignmentSensors extends SubsystemBase{
 
     private final CANrange rightCanrange = new CANrange(61);//change CAN ID later
     private final CANrange leftCanrange = new CANrange(60); //change CAN ID later
-
-    public String alignmentState = "not aligned";
-
+    private Pose2d currentPose;
+    private Pose2d goalPose;
+    Boolean isAligned;
     public AlignmentSensors(){
 
         CANrangeConfiguration canrangeConfig = new CANrangeConfiguration();
@@ -26,18 +28,12 @@ public class AlignmentSensors extends SubsystemBase{
 
         leftCanrange.getConfigurator().apply(canrangeConfig);
         rightCanrange.getConfigurator().apply(canrangeConfig);
-    }{
-
-        Boolean isAligned;
-        isAligned = rightCanrange.getIsDetected().getValue() && leftCanrange.getIsDetected().getValue();
-       
-
-    if (isAligned == true) {
-     alignmentState = "aligned";  
-    } else{
-        alignmentState = "not aligned";
     }
-}
+    public Boolean IsAligned(){ 
+        isAligned = rightCanrange.getIsDetected().getValue() && leftCanrange.getIsDetected().getValue();
+        return isAligned;
+    }
+
 
   
 
