@@ -35,16 +35,16 @@ public class AlignmentSensors extends SubsystemBase{
         isAligned = rightCanrange.getIsDetected().getValue() && leftCanrange.getIsDetected().getValue();
         return isAligned;
     }
-    public ChassisSpeeds getAlignOutputs(){
-        double leftDistance = leftCanrange.getDistance().getValueAsDouble();//both meters
-        double rightDistance = rightCanrange.getDistance().getValueAsDouble();
-        leftDistance -= Units.feetToMeters(distanceBetweenRobots);
-        rightDistance -= Units.feetToMeters(distanceBetweenRobots);
-        double rotation = rightDistance - leftDistance;
-        rotation = Units.radiansToDegrees(Math.atan(rotation/distanceBetweenCANranges));
-        double x = (leftDistance + rightDistance)/2;
+    // public ChassisSpeeds getAlignOutputs(){
+    //     double leftDistance = leftCanrange.getDistance().getValueAsDouble();//both meters
+    //     double rightDistance = rightCanrange.getDistance().getValueAsDouble();
+    //     leftDistance -= Units.feetToMeters(distanceBetweenRobots);
+    //     rightDistance -= Units.feetToMeters(distanceBetweenRobots);
+    //     double rotation = rightDistance - leftDistance;
+    //     rotation = Units.radiansToDegrees(Math.atan(rotation/distanceBetweenCANranges));
+    //     double x = (leftDistance + rightDistance)/2;
         
-    }
+    // }
 
   
 
