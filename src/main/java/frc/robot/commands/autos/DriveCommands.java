@@ -14,6 +14,7 @@
 package frc.robot.commands.autos;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,6 +32,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.drive.AlignmentSensors;
 import frc.robot.subsystems.drive.Drive;
 
 import java.text.DecimalFormat;
@@ -337,7 +339,7 @@ public class DriveCommands {
     ProfiledPIDController xPIDController;
     ProfiledPIDController yPIDController;
     Pose2d TargetPose = getTowerPose("right");
-    goToTowerRightCommand(Drive drive) {
+    public goToTowerRightCommand(Drive drive) {
       this.drive = drive;
       addRequirements(drive);
     }
@@ -376,14 +378,40 @@ public class DriveCommands {
       return anglePIDController.atGoal() && xPIDController.atGoal() && yPIDController.atGoal();
     }
   }
+  public static class alignToRobotCommand extends Command {
+    Drive drive;
+    AlignmentSensors alignmentSensors;
+    alignToRobotCommand(Drive drive, AlignmentSensors alignmentSensors){ 
+      this.drive = drive;
+      this.alignmentSensors = alignmentSensors;
+      addRequirements(drive);
+    }
+    @Override
+    public void initialize() {
+        Pose2d targetPose = alignmentSensors.getAlignTargetPose(drive);
+        if (targetPose == null) {
+          System.out.println("alignToRobot failed, no target detected");
+        }
+        PIDController anglePIDController = new PIDController(ANGLE_KP, 0.0, ANGLE_KD);
+        anglePIDController.enableContinuousInput(-Math.PI, Math.PI);
+        
+    }
 
+    @Override
+    public void execute() {
+       Pose2d targetPose = alignmentSensors.getAlignTargetPose(drive);
+      if (targetPose != null) {
+        ChassisSpeeds speeds = new ChassisSpeeds();
+      }
+    }
+  }
   public static class goToTowerLeftCommand extends Command {
     ProfiledPIDController anglePIDController;
     ProfiledPIDController xPIDController;
     ProfiledPIDController yPIDController;
     Drive drive;
     Pose2d TargetPose = getTowerPose("left");
-    goToTowerLeftCommand(Drive drive) {
+    public goToTowerLeftCommand(Drive drive){
       this.drive = drive;
       addRequirements(drive);
     }
@@ -437,3 +465,4 @@ public class DriveCommands {
     return new goToTowerLeftCommand(drive);
   }
 }
+

@@ -49,11 +49,11 @@ public class Climber extends SubsystemBase {
   public void periodic() {
     //logClimberState();//uncomment once motors on
     // This method will be called once per scheduler run
-    if (climberState == "climb" && climberEncoder.getPosition().getValueAsDouble() < climbTopLimit) {
+    if (climberState.equals("climb") && climberEncoder.getPosition().getValueAsDouble() < climbTopLimit) {
       leadClimbMotor.set(climbSpeed);
-    } else if (climberState == "hold") {
+    } else if (climberState.equals("hold")) {
       leadClimbMotor.stopMotor();// idk the difference from set(0)
-    } else if (climberState == "descend" && climberEncoder.getPosition().getValueAsDouble() > climbBottomLimit) {
+    } else if (climberState.equals("descend") && climberEncoder.getPosition().getValueAsDouble() > climbBottomLimit) {
       leadClimbMotor.set(-.5);
     }
 
@@ -107,7 +107,7 @@ public class Climber extends SubsystemBase {
             climber.climberState = "manual";
             climber.leadClimbMotor.set(speed.getAsDouble());
           } else {
-            if (climber.climberState == "manual") {
+            if (climber.climberState.equals("manual")) {
               climber.leadClimbMotor.stopMotor();
             }
           }
