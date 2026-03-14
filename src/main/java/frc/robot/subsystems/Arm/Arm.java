@@ -29,11 +29,11 @@ public class Arm extends SubsystemBase {
   // Add any necessary motor controllers, sensors, or other components here
   private String state = "neutral";
   private final TalonFX armMotor;
-  private final double armTopLimit = .1;// make sure zero is arm up, or adjust later
-  private final double armBottomLimit = 0.125;// in rotations, ADJUST LATER
+  private final double armTopLimit = .01;// make sure zero is arm up, or adjust later
+  private final double armBottomLimit = 0.24;// in rotations, ADJUST LATER
   private final CANcoder armCANcoder = new CANcoder(54);
 
-  private static final double kP = 0.1; // adjust later
+  private static final double kP = 1; // adjust later
   private static final double kI = 0.0; // adjust later
   private static final double kD = 0.0; // adjust later
 
@@ -109,7 +109,7 @@ public class Arm extends SubsystemBase {
 
 public void retractArm() { 
    armPidController.setSetpoint(armTopLimit);
-   double error = armPidController.getErrorTolerance();
+   double error = armPidController.getErrorTolerance();//not that useful
    double output = armPidController.calculate(armPosition, armTopLimit);
    SmartDashboard.putString("arm pid output", Double.toString(output));
     armMotor.set(output);
