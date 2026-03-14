@@ -45,7 +45,7 @@ public class Intake extends SubsystemBase {
 
   // Add methods to control the intake subsystem
   public void intake() {
-    intakeMotor.set(0.5);
+    intakeMotor.set(2/3);
     // Code to start the intake mechanism
   }
 
@@ -58,8 +58,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void outake() {
-
-    intakeMotor.set(-0.5);
+    intakeMotor.set(-2/3);
   }
 
   public Command OuttakeCommand() {
