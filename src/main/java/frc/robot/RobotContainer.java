@@ -120,6 +120,7 @@ public class RobotContainer {
         arm = new Arm();
         hopper = new Hopper();
         hopperDistanceSensor = new HopperDistanceSensor();
+
         // this is the template auto chooser stuff, we are using pathplanner auto
         // chooser now
         // Set up auto routines
