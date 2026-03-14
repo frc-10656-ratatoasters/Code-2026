@@ -30,8 +30,8 @@ public class Arm extends SubsystemBase {
   private String state = "neutral";
   private final TalonFX armMotor;
   private final double armTopLimit = .01;// make sure zero is arm up, or adjust later
-  private final double armBottomLimit = 0.24;// in rotations, ADJUST LATER
-  private final CANcoder armCANcoder = new CANcoder(54);
+  private final double armBottomLimit = 0.23;// in rotations, ADJUST LATER
+  private final CANcoder armCANcoder = new CANcoder(53);
 
   private static final double kP = 1; // adjust later
   private static final double kI = 0.0; // adjust later

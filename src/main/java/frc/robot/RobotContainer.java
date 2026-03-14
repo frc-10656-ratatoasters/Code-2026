@@ -178,7 +178,7 @@ public class RobotContainer {
                         climber));
         intake.setDefaultCommand(
                 intake.setIntakeSpeed(
-                        () -> (OperatorController.getRightY()/2),//half speed, might change
+                        () -> (OperatorController.getRightY()/1.5),//half speed, might change
                         intake));
 
         // Lock to 0° when A button is held
