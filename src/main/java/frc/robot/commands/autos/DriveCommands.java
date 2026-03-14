@@ -369,13 +369,13 @@ public class DriveCommands {
     }
 
     @Override
-    public void execute() {
+    public void execute() {//ALL NEGATIVE cause unknown thing causing drive to go backwards. Except angle cause that seemed unaffected.
       double angleOutput = anglePIDController.calculate(
           drive.getPoseEstimator().getEstimatedPosition().getRotation().getRadians(),
           TargetPose.getRotation().getRadians());
-      double xOutput = xPIDController.calculate(
+      double xOutput = -xPIDController.calculate(
           drive.getPoseEstimator().getEstimatedPosition().getX(), TargetPose.getX());
-      double yOutput = yPIDController.calculate(
+      double yOutput = -yPIDController.calculate(
           drive.getPoseEstimator().getEstimatedPosition().getY(), TargetPose.getY());
       // angleOutput is in radians (controller input/output in radians/sec), so pass
       // directly
@@ -455,9 +455,9 @@ public class DriveCommands {
       double angleOutput = anglePIDController.calculate(
           drive.getPoseEstimator().getEstimatedPosition().getRotation().getRadians(),
           TargetPose.getRotation().getRadians());
-      double xOutput = xPIDController.calculate(
+      double xOutput = -xPIDController.calculate(
           drive.getPoseEstimator().getEstimatedPosition().getX(), TargetPose.getX());
-      double yOutput = yPIDController.calculate(
+      double yOutput = -yPIDController.calculate(
           drive.getPoseEstimator().getEstimatedPosition().getY(), TargetPose.getY());
       ChassisSpeeds speeds = new ChassisSpeeds(xOutput, yOutput, angleOutput);
       drive.runVelocity(speeds);
