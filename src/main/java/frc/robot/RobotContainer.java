@@ -38,6 +38,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.hopper.HopperDistanceSensor;
 import frc.robot.subsystems.hopper.Hopper;
@@ -59,7 +60,7 @@ public class RobotContainer {
     private final Intake intake;
     private final Climber climber;
     private final HopperDistanceSensor hopperDistanceSensor;
-
+    private final Arm arm;
     // Controller
     public final CommandXboxController DriveController = new CommandXboxController(0);
     public final CommandXboxController OperatorController = new CommandXboxController(1);
@@ -115,6 +116,7 @@ public class RobotContainer {
         intake = new Intake();
         climber = new Climber();
         hopperDistanceSensor = new HopperDistanceSensor();
+        arm = new Arm();
         // this is the template auto chooser stuff, we are using pathplanner auto
         // chooser now
         // Set up auto routines
@@ -188,7 +190,7 @@ public class RobotContainer {
         OperatorController.rightTrigger(.1).whileTrue(intake.
         IntakeCommand()); // left trigger is outake
         OperatorController.leftTrigger().whileTrue(intake.OuttakeCommand()); // left bumper in intake
-        OperatorController.rightBumper().whileTrue(intake.extendArmCommand());
+        OperatorController.rightBumper().whileTrue(arm.extendArmCommand());
         OperatorController.leftBumper().whileTrue(intake.retractArmCommand());
         OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
         OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
