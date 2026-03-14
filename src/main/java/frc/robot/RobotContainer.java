@@ -38,6 +38,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.hopper.HopperDistanceSensor;
 import frc.robot.subsystems.hopper.Hopper;
@@ -58,6 +59,8 @@ public class RobotContainer {
     private final Drive drive;
     private final Intake intake;
     private final Climber climber;
+    private final Arm arm;
+    private final Hopper hopper;
     private final HopperDistanceSensor hopperDistanceSensor;
 
     // Controller
@@ -114,6 +117,8 @@ public class RobotContainer {
 
         intake = new Intake();
         climber = new Climber();
+        arm = new Arm();
+        hopper = new Hopper();
         hopperDistanceSensor = new HopperDistanceSensor();
         // this is the template auto chooser stuff, we are using pathplanner auto
         // chooser now
@@ -162,9 +167,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -DriveController.getLeftY(),
-                        () -> -DriveController.getLeftX(),
-                        () -> -DriveController.getRightX()));
+                        () -> DriveController.getLeftY(),
+                        () -> DriveController.getLeftX(),
+                        () -> -DriveController.getRightX()));//ITS BACKWARDS NOW
 
         climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
                 climber.joystickClimbCommand(
@@ -188,8 +193,8 @@ public class RobotContainer {
         OperatorController.rightTrigger(.1).whileTrue(intake.
         IntakeCommand()); // left trigger is outake
         OperatorController.leftTrigger().whileTrue(intake.OuttakeCommand()); // left bumper in intake
-        OperatorController.rightBumper().whileTrue(intake.extendArmCommand());
-        OperatorController.leftBumper().whileTrue(intake.retractArmCommand());
+        OperatorController.rightBumper().whileTrue(arm.extendArmCommand());
+        OperatorController.leftBumper().whileTrue(arm.retractArmCommand());
         OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
         OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
         OperatorController.y().onTrue(climber.ClimbCommand());// includes safe limit
@@ -199,8 +204,8 @@ public class RobotContainer {
 
         //registering commands for Pathplanner
         NamedCommands.registerCommand("climb L1", climber.ClimbCommand());
-        NamedCommands.registerCommand("Extend Arm", intake.extendArmCommand());
-        NamedCommands.registerCommand("Retract Arm", intake.retractArmCommand());
+        NamedCommands.registerCommand("Extend Arm", arm.extendArmCommand());
+        NamedCommands.registerCommand("Retract Arm", arm.retractArmCommand());
         NamedCommands.registerCommand("Start Intake", intake.IntakeCommand());
         NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
         NamedCommands.registerCommand("outtake", intake.OuttakeCommand());

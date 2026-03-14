@@ -32,7 +32,6 @@ public class Climber extends SubsystemBase {
     followerClimbMotor = new TalonFX(58); // change canID later
     followerClimbMotor.setControl(new Follower(10, MotorAlignmentValue.Aligned));
     climberEncoder = new CANcoder(60);// maybe 60s can be climb stuff
-    // may have to invert??
     // followerClimbMotor.setControlMode(ControlModeValue.Follower,
     // leadClimbMotor.getDeviceID());
     // makes it brake when off, so it doesnt fall off
