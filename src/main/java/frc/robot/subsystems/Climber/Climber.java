@@ -21,7 +21,7 @@ public class Climber extends SubsystemBase {
   private final TalonFX followerClimbMotor;
   private final double climbSpeed = .5;// from -1 to 1, might have to reverse
   public String climberState = "hold";
-  public final CANcoder climberEncoder;
+
   private final double climbTopLimit = 0.9;
   private final double climbBottomLimit = 0.2;
 
@@ -31,7 +31,6 @@ public class Climber extends SubsystemBase {
     leadClimbMotor = new TalonFX(57); // change canID
     followerClimbMotor = new TalonFX(58); // change canID later
     followerClimbMotor.setControl(new Follower(10, MotorAlignmentValue.Aligned));
-    climberEncoder = new CANcoder(60);// maybe 60s can be climb stuff
     // followerClimbMotor.setControlMode(ControlModeValue.Follower,
     // leadClimbMotor.getDeviceID());
     // makes it brake when off, so it doesnt fall off
@@ -48,11 +47,11 @@ public class Climber extends SubsystemBase {
   public void periodic() {
     //logClimberState();//uncomment once motors on
     // This method will be called once per scheduler run
-    if (climberState.equals("climb") && climberEncoder.getPosition().getValueAsDouble() < climbTopLimit) {
+    if (climberState.equals("climb") && leadClimbMotor.getPosition().getValueAsDouble() < climbTopLimit) {
       leadClimbMotor.set(climbSpeed);
     } else if (climberState.equals("hold")) {
       leadClimbMotor.stopMotor();// idk the difference from set(0)
-    } else if (climberState.equals("descend") && climberEncoder.getPosition().getValueAsDouble() > climbBottomLimit) {
+    } else if (climberState.equals("descend") && leadClimbMotor.getPosition().getValueAsDouble() > climbBottomLimit) {
       leadClimbMotor.set(-.5);
     }
 

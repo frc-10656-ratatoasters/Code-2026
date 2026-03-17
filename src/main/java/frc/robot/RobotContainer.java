@@ -178,7 +178,7 @@ public class RobotContainer {
                         climber));
         intake.setDefaultCommand(
                 intake.setIntakeSpeed(
-                        () -> (-OperatorController.getRightY()/1.5),//half speed, might change
+                        () -> (-OperatorController.getRightY()/1.5),//lower speed, might change
                         intake));
 
         // Lock to 0° when A button is held
@@ -191,17 +191,12 @@ public class RobotContainer {
                                 () -> -DriveController.getLeftX(),
                                 () -> new Rotation2d()));
         //Setting drive controls
-        OperatorController.rightTrigger(.1).whileTrue(intake.
-        IntakeCommand()); // left trigger is outake
-        OperatorController.leftTrigger().whileTrue(intake.OuttakeCommand()); // left bumper in intake
-        OperatorController.rightBumper().whileTrue(arm.extendArmCommand());
-        OperatorController.leftBumper().whileTrue(arm.retractArmCommand());
+        OperatorController.rightTrigger().whileTrue(arm.extendArmCommand());
+        OperatorController.leftTrigger().whileTrue(arm.retractArmCommand());
         OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
         OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
         OperatorController.y().onTrue(climber.ClimbCommand());// includes safe limit
         OperatorController.a().onTrue(climber.HoldClimbCommand());
-        DriveController.leftTrigger().whileTrue(climber.ClimbCommand());
-        DriveController.rightTrigger().whileTrue(climber.descendClimbCommand());
 
         //registering commands for Pathplanner
         NamedCommands.registerCommand("climb L1", climber.ClimbCommand());

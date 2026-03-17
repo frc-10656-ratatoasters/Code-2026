@@ -30,10 +30,10 @@ public class Arm extends SubsystemBase {
   private String state = "neutral";
   private final TalonFX armMotor;
   private final double armTopLimit = .01;// make sure zero is arm up, or adjust later
-  private final double armBottomLimit = 0.23;// in rotations, ADJUST LATER
+  private final double armBottomLimit = 0.2;// in rotations, ADJUST LATER
   private final CANcoder armCANcoder = new CANcoder(53);
 
-  private static final double kP = 1; // adjust later
+  private static final double kP = 0.6; // adjust later
   private static final double kI = 0.0; // adjust later
   private static final double kD = 0.0; // adjust later
 
@@ -91,7 +91,7 @@ public class Arm extends SubsystemBase {
     } else {
       armMotor.stopMotor();
     }
-  
+  SmartDashboard.putString("Arm state", state);
 
 // This method will be called once per scheduler run
   }
