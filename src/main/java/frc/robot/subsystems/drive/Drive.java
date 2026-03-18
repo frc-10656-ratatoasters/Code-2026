@@ -187,22 +187,22 @@ public class Drive extends SubsystemBase {
   }
   public void addVisionMeasurement(String limeLightName){
     boolean doRejectUpdate = false;
-    LimelightHelpers.SetRobotOrientation("limelight-one", gyroIO.getYaw().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
-    LimelightHelpers.SetRobotOrientation("limelight-two", gyroIO.getYaw().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+    LimelightHelpers.SetRobotOrientation("limelight-left", gyroIO.getYaw().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+    LimelightHelpers.SetRobotOrientation("limelight-right", gyroIO.getYaw().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
     //limelight has a IMU which is like a gyro
     if(DriverStation.isDisabled()){
       //this sets the limelights IMU to the same value as gyro so its super accurate once enabled
-      LimelightHelpers.SetIMUMode("limelight-one",1 );
-      LimelightHelpers.SetIMUMode("limelight-two",1 );
+      LimelightHelpers.SetIMUMode("limelight-left",1 );
+      LimelightHelpers.SetIMUMode("limelight-right",1 );
     }
     else{
       //this makes it so that when its enabled, setRobotOrientation uses both our pigeon and the IMU in the limelight. Details in limelight docs.
-      LimelightHelpers.SetIMUMode("limelight-one",4 );
-      LimelightHelpers.SetIMUMode("limelight-two",4 );
+      LimelightHelpers.SetIMUMode("limelight-left",4 );
+      LimelightHelpers.SetIMUMode("limelight-right",4 );
     }
 
-    LimelightHelpers.PoseEstimate limelightOneMt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-one");
-    LimelightHelpers.PoseEstimate limelightTwoMt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-two");
+    LimelightHelpers.PoseEstimate limelightOneMt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-left");
+    LimelightHelpers.PoseEstimate limelightTwoMt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-right");
     if(Math.abs(gyroIO.getYawVelocityDegreesPerSec()) > 360){
       doRejectUpdate = true;
     }
@@ -228,10 +228,10 @@ public class Drive extends SubsystemBase {
     String poseString = getPose().toString();
     SmartDashboard.putString("CurrentPose", poseString);
     
-    addVisionMeasurement("limelight-one");
-    addVisionMeasurement("limelight-two");
-  //  limelightOnePose = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-one").toPose3d();
-   // limelightTwoPose = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-two").toPose3d();
+    addVisionMeasurement("limelight-left");
+    addVisionMeasurement("limelight-right");
+  //  limelightOnePose = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-left").toPose3d();
+   // limelightTwoPose = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-right").toPose3d();
     robotPose = poseEstimator.getEstimatedPosition();
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);

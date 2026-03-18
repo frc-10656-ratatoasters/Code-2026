@@ -40,7 +40,6 @@ public class Intake extends SubsystemBase {
       stopIntake();
     }
     // This method will be called once per scheduler run
-
   }
 
   // Add methods to control the intake subsystem
@@ -82,6 +81,7 @@ public class Intake extends SubsystemBase {
         () -> {
           intake.intakeState = "manual";
           intake.intakeMotor.set(speed.getAsDouble());
+          SmartDashboard.putNumber("intake speed", speed.getAsDouble());
         },
         this);
   }
