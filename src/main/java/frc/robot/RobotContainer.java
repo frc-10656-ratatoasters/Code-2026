@@ -195,8 +195,9 @@ public class RobotContainer {
         OperatorController.leftTrigger().whileTrue(arm.retractArmCommand());
         OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
         OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
-        OperatorController.y().onTrue(climber.ClimbCommand());// includes safe limit
-        OperatorController.a().onTrue(climber.HoldClimbCommand());
+        OperatorController.a().onTrue(arm.toggleJiggleMotor());
+        //OperatorController.y().onTrue(climber.ClimbCommand());// includes safe limit
+        //OperatorController.a().onTrue(climber.HoldClimbCommand());
 
         //registering commands for Pathplanner
         NamedCommands.registerCommand("climb L1", climber.ClimbCommand());

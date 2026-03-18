@@ -29,14 +29,14 @@ public class Arm extends SubsystemBase {
   // Add any necessary motor controllers, sensors, or other components here
   private String state = "neutral";
   private final TalonFX armMotor;
-  private final double armTopLimit = .01;// make sure zero is arm up, or adjust later
-  private final double armBottomLimit = 0.2;// in rotations, ADJUST LATER
+  private final double armTopLimit = .02;// make sure zero is arm up, or adjust later
+  private final double armBottomLimit = 0.22;// in rotations, ADJUST LATER
   private final CANcoder armCANcoder = new CANcoder(53);
 
-  private static final double kP = 0.6; // adjust later
+  private static final double kP = 0.5; // adjust later
   private static final double kI = 0.0; // adjust later
   private static final double kD = 0.0; // adjust later
-
+  private boolean jiggleModeUp = true;
   //arm feedforward values?
   //makes a new PID controller
   PIDController armPidController = new PIDController(kP, kI, kD);
@@ -49,6 +49,8 @@ public class Arm extends SubsystemBase {
     // Constructor for the Arm subsystem
     // Initialize components here
     SmartDashboard.putString("arm pid output", "0");
+    SmartDashboard.putString("arm ", state);
+    SmartDashboard.putBoolean("jiggle mode", jiggleModeUp);
     armMotor = new TalonFX(52);
     armCANcoder.setPosition(0); //hopefully callibrates encoder to zero when robot turns on, adjust if not
     armMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -81,6 +83,20 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putString("Arm Encoder Position", String.valueOf(armPosition));
   }
   }
+    public void jiggleMotor(){
+    if (armPosition <= .12){
+      jiggleModeUp = false;
+    }
+    else if(armPosition >= .13){
+      jiggleModeUp = true;
+    }
+    if(jiggleModeUp){
+      armMotor.set(-.25);
+    }
+    else{
+      armMotor.set(.25);
+    }
+  }
   @Override
   public void periodic(){
     updateArmPosition();// uncomment when motor is on and set
@@ -90,13 +106,26 @@ public class Arm extends SubsystemBase {
       retractArm();
     } else {
       armMotor.stopMotor();
+    } if(state.equals("jiggle")){
+      jiggleMotor();
     }
   SmartDashboard.putString("Arm state", state);
-
+  SmartDashboard.putString("arm ", state);
+  SmartDashboard.putBoolean("jiggle mode", jiggleModeUp);
 // This method will be called once per scheduler run
   }
-
+  public Command toggleJiggleMotor(){
+    return new InstantCommand(() -> {
+      if(state.equals("jiggle")){
+        state = "neutral";
+      }
+      else{
+        state = "jiggle";
+      }
+    }, this);
+  }
   // Add methods to control the arm subsystem
+
 
   public void extendArm() {
   armPidController.setSetpoint(armBottomLimit);
