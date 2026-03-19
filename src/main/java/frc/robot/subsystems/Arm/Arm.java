@@ -30,10 +30,11 @@ public class Arm extends SubsystemBase {
   private String state = "neutral";
   private final TalonFX armMotor;
   private final double armTopLimit = .02;// make sure zero is arm up, or adjust later
-  private final double armBottomLimit = 0.22;// in rotations, ADJUST LATER
+  private final double armBottomLimit = 0.2;// in rotations, ADJUST LATER
   private final CANcoder armCANcoder = new CANcoder(53);
 
-  private static final double kP = 0.5; // adjust later
+  
+  private static final double kP = 0.65; // adjust later
   private static final double kI = 0.0; // adjust later
   private static final double kD = 0.0; // adjust later
   private boolean jiggleModeUp = true;
@@ -109,6 +110,7 @@ public class Arm extends SubsystemBase {
     } if(state.equals("jiggle")){
       jiggleMotor();
     }
+
   SmartDashboard.putString("Arm state", state);
   SmartDashboard.putString("arm ", state);
   SmartDashboard.putBoolean("jiggle mode", jiggleModeUp);
