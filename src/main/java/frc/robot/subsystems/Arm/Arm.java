@@ -158,6 +158,23 @@ public void retractArm() {
     }, this);
   }
 
+  public void manualArm (double power){
+    if (armPosition < armTopLimit && power < 0){
+    armMotor.set(power);
+    } else if (armPosition > armBottomLimit && power > 0){
+      armMotor.set(power);
+    } else {
+      armMotor.set(0);
+    }
+  }
+
+  public Command manualArmCommand(double power) {
+    return new InstantCommand(() -> {
+      manualArm(power);
+    }, this);
+
+  }
+
 
 }
 
