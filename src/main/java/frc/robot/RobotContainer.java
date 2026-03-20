@@ -193,14 +193,17 @@ public class RobotContainer {
                                 () -> -DriveController.getLeftY(),
                                 () -> -DriveController.getLeftX(),
                                 () -> new Rotation2d()));
+        arm.setDefaultCommand(
+                arm.manualArmCommand(
+                        () -> (OperatorController.getLeftY()/2),
+                        arm));
+
         //Setting drive controls
         OperatorController.rightTrigger().whileTrue(arm.extendArmCommand());
         OperatorController.leftTrigger().whileTrue(arm.retractArmCommand());
         OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
         OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
         OperatorController.a().onTrue(arm.toggleJiggleMotor());
-
-        arm.manualArmCommand(OperatorController.getLeftY());
         //OperatorController.y().onTrue(climber.ClimbCommand());// includes safe limit
         //OperatorController.a().onTrue(climber.HoldClimbCommand());
 

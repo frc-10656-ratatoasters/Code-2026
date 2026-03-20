@@ -158,19 +158,19 @@ public void retractArm() {
     }, this);
   }
 
-  public void manualArm (double power){
-    if (armPosition < armTopLimit && power < 0){
-    armMotor.set(power);
-    } else if (armPosition > armBottomLimit && power > 0){
-      armMotor.set(power);
+  public void manualArm (DoubleSupplier speed, Arm arm){
+    if (armPosition < armTopLimit && speed.getAsDouble() < 0){
+    armMotor.set(speed.getAsDouble());
+    } else if (armPosition > armBottomLimit && speed.getAsDouble() > 0){
+      armMotor.set(speed.getAsDouble());
     } else {
       armMotor.set(0);
     }
   }
 
-  public Command manualArmCommand(double power) {
+  public Command manualArmCommand(DoubleSupplier speed, Arm arm) {
     return new InstantCommand(() -> {
-      manualArm(power);
+      manualArm(speed, arm);
     }, this);
 
   }
