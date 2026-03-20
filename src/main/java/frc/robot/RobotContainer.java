@@ -172,10 +172,10 @@ public class RobotContainer {
                         () -> DriveController.getLeftX(),
                         () -> -DriveController.getRightX()));//ITS BACKWARDS NOW
 
-        climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
-                climber.joystickClimbCommand(
-                        () -> -OperatorController.getLeftY(),
-                        climber));
+        // climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
+        //         climber.joystickClimbCommand(
+        //                 () -> -OperatorController.getLeftY(),
+        //                 climber)); //uncommment once climb works
         intake.setDefaultCommand(
                 intake.setIntakeSpeed(
                         () -> (-OperatorController.getRightY()/1.5),//lower speed, might change
@@ -193,9 +193,9 @@ public class RobotContainer {
         //Setting drive controls
         OperatorController.rightTrigger().whileTrue(arm.extendArmCommand());
         OperatorController.leftTrigger().whileTrue(arm.retractArmCommand());
-        OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
-        OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
-        OperatorController.a().onTrue(arm.toggleJiggleMotor());
+ //       OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
+  //      OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
+        //OperatorController.a().onTrue(arm.toggleJiggleMotor());
         //OperatorController.y().onTrue(climber.ClimbCommand());// includes safe limit
         //OperatorController.a().onTrue(climber.HoldClimbCommand());
 
