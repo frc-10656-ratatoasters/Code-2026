@@ -203,9 +203,9 @@ public class RobotContainer {
         //Setting drive controls
         OperatorController.rightTrigger().whileTrue(arm.extendArmCommand());
         OperatorController.leftTrigger().whileTrue(arm.retractArmCommand());
-        OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
-        OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
-        OperatorController.a().onTrue(arm.toggleJiggleMotor());
+ //       OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
+  //      OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
+        //OperatorController.a().onTrue(arm.toggleJiggleMotor());
         //OperatorController.y().onTrue(climber.ClimbCommand());// includes safe limit
         //OperatorController.a().onTrue(climber.HoldClimbCommand());
 
