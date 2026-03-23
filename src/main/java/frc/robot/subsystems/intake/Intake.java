@@ -44,28 +44,20 @@ public class Intake extends SubsystemBase {
 
   // Add methods to control the intake subsystem
   public void intake() {
-    intakeMotor.set(2/3);
+    intakeMotor.set(1/2);
     // Code to start the intake mechanism
   }
 
-  public Command IntakeCommand() {
-    return new InstantCommand(
-        () -> {
-          intakeState = "intake";
-        },
-        this);
+  public void SetStateToIntake() {
+    intakeState = "intake";
   }
 
   public void outake() {
     intakeMotor.set(-2/3);
   }
 
-  public Command OuttakeCommand() {
-    return new InstantCommand(
-        () -> {
-          intakeState = "outtake";
-        },
-        this);
+  public void setStateToOuttake() {
+    intakeState = "outtake";
   }
 
   public Command stopIntakeCommand() {

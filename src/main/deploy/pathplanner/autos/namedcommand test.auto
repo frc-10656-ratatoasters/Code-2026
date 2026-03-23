@@ -7,31 +7,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": "IntakeRed"
+            "pathName": "New New Path"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Extend Arm"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 3.0
+            "waitTime": 2.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Stop Intake"
+            "name": "Outtake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Retract Arm"
+            "name": "Stop Outake"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "No Climb Autos",
+  "folder": null,
   "choreoAuto": false
 }

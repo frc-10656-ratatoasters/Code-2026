@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.autos.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -42,6 +41,8 @@ import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.hopper.HopperDistanceSensor;
 import frc.robot.subsystems.hopper.Hopper;
+// import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.autos.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -62,6 +63,7 @@ public class RobotContainer {
     private final Arm arm;
     private final Hopper hopper;
     private final HopperDistanceSensor hopperDistanceSensor;
+        
 
     // Controller
     public final CommandXboxController DriveController = new CommandXboxController(0);
@@ -211,15 +213,17 @@ public class RobotContainer {
         NamedCommands.registerCommand("climb L1", climber.ClimbCommand());
         NamedCommands.registerCommand("Extend Arm", arm.extendArmCommand());
         NamedCommands.registerCommand("Retract Arm", arm.retractArmCommand());
-        NamedCommands.registerCommand("Start Intake", intake.IntakeCommand());
+       // NamedCommands.registerCommand("Intake", new IntakeCommand());
         NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
-        NamedCommands.registerCommand("outtake", intake.OuttakeCommand());
+       // NamedCommands.registerCommand("Outtake", new OuttakeCommand());
+        NamedCommands.registerCommand("Stop Outake", intake.stopIntakeCommand());
+
 
         // Switch to X pattern when X button is pressed
         // DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive)); //was
         // in the template
         DriveController.y().onTrue(Commands.runOnce(drive::zeroGyro, drive));
-        // Reset gyro to 0° when B button is pressed
+        // Reset gyro to 0° when b button is pressed
         DriveController
                 .b()
                 .onTrue(
@@ -227,8 +231,10 @@ public class RobotContainer {
                                 () -> drive.setPose(
                                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                                 drive)
+
                                 .ignoringDisable(true));
     }
+
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

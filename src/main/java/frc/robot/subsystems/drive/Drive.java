@@ -212,11 +212,11 @@ public class Drive extends SubsystemBase {
     if(!doRejectUpdate){
       if (limelightOneMt2 != null && limelightOneMt2.tagCount > 0) {
         poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));//idk what this is its in limelight docs
-        poseEstimator.addVisionMeasurement(limelightOneMt2.pose, limelightOneMt2.timestampSeconds);
+        //poseEstimator.addVisionMeasurement(limelightOneMt2.pose, limelightOneMt2.timestampSeconds);
       }
       if (limelightTwoMt2 != null && limelightTwoMt2.tagCount > 0) {
         poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));//idk what this is its in limelight docs
-        poseEstimator.addVisionMeasurement(limelightTwoMt2.pose, limelightTwoMt2.timestampSeconds);
+        //poseEstimator.addVisionMeasurement(limelightTwoMt2.pose, limelightTwoMt2.timestampSeconds);
       }
     }
     
@@ -228,8 +228,8 @@ public class Drive extends SubsystemBase {
     String poseString = getPose().toString();
     SmartDashboard.putString("CurrentPose", poseString);
     
-    addVisionMeasurement("limelight-left");
-    addVisionMeasurement("limelight-right");
+    //addVisionMeasurement("limelight-left");
+    //addVisionMeasurement("limelight-right");
   //  limelightOnePose = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-left").toPose3d();
    // limelightTwoPose = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-right").toPose3d();
     robotPose = poseEstimator.getEstimatedPosition();

@@ -6,6 +6,8 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -32,9 +34,9 @@ public class Arm extends SubsystemBase {
   private final double armTopLimit = .02;// make sure zero is arm up, or adjust later
   private final double armBottomLimit = 0.2;// in rotations, ADJUST LATER
   private final CANcoder armCANcoder = new CANcoder(53);
-
+  private Boolean commandRan = false;
   
-  private static final double kP = 0.65; // adjust later
+  private static final double kP = 0.8; // adjust later
   private static final double kI = 0.0; // adjust later
   private static final double kD = 0.0; // adjust later
   private boolean jiggleModeUp = true;
@@ -52,10 +54,12 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putString("arm pid output", "0");
     SmartDashboard.putString("arm ", state);
     SmartDashboard.putBoolean("jiggle mode", jiggleModeUp);
+    SmartDashboard.putBoolean("commandRan", commandRan);
     armMotor = new TalonFX(52);
     armCANcoder.setPosition(0); //hopefully callibrates encoder to zero when robot turns on, adjust if not
     armMotor.setNeutralMode(NeutralModeValue.Brake);
     configureCurrentLimits();
+    
   }
     public void configureCurrentLimits(){
     TalonFXConfiguration toConfigure = new TalonFXConfiguration();
@@ -149,12 +153,14 @@ public void retractArm() {
   public Command extendArmCommand() {
     return new InstantCommand(() -> {
     state = "Extend";
-    }, this);
-  }
+    commandRan = true;
+    SmartDashboard.putBoolean("commandRan",commandRan);
+    }, this);}
 
   public Command retractArmCommand() {
     return new InstantCommand(() -> {
     state = "Retract";
+    commandRan = true;
     }, this);
   }
 
