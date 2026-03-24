@@ -170,9 +170,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> DriveController.getLeftY(),
-                        () -> DriveController.getLeftX(),
-                        () -> -DriveController.getRightX()));//ITS BACKWARDS NOW
+                        () -> -DriveController.getLeftY(),
+                        () -> -DriveController.getLeftX(),
+                        () -> -DriveController.getRightX()));
 
         // climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
         //         climber.joystickClimbCommand(
