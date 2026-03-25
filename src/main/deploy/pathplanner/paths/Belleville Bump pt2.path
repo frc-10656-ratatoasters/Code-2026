@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.076105563480743,
+        "x": 1.0761055634807428,
         "y": 2.437075606276749
       },
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 35.53767779197441
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Belleville Bump Test",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

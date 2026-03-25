@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4050641940085593,
-        "y": 2.592339514978602
+        "x": 3.6038674698795177,
+        "y": 7.433518072289157
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.318216833095578,
-        "y": 2.385320970042797
+        "x": 5.567013481947557,
+        "y": 7.506144445121114
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.1111982881597715,
-        "y": 2.450014265335236
+        "x": 6.8384698795180725,
+        "y": 7.433518072289157
       },
       "prevControl": {
-        "x": 2.9522111269614832,
-        "y": 2.5535235378031382
+        "x": 5.603638554216867,
+        "y": 7.466301204819277
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "bluebump"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 1.273030020056672
   },
   "reversed": false,
-  "folder": "Belleville Bump Test",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -6.911227119024644
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

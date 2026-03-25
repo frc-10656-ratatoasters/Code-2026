@@ -3,11 +3,13 @@
   "robotLength": 0.82,
   "holonomicMode": true,
   "pathFolders": [
-    "right side",
-    "left side"
+    "Belleville Bump Test",
+    "left side",
+    "right side"
   ],
   "autoFolders": [
     "Blue Autos",
+    "Saline Autos",
     "No Climb Autos",
     "Red Autos"
   ],
