@@ -41,6 +41,7 @@ import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.hopper.HopperDistanceSensor;
 import frc.robot.subsystems.hopper.Hopper;
+import edu.wpi.first,wpilibj2.command.InstantCommand;
 // import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.autos.*;
 
@@ -63,7 +64,7 @@ public class RobotContainer {
     private final Arm arm;
     private final Hopper hopper;
     private final HopperDistanceSensor hopperDistanceSensor;
-        
+    private int joysticksCoefficient = 1;//1 or -1 to reverse controls
 
     // Controller
     public final CommandXboxController DriveController = new CommandXboxController(0);
@@ -170,8 +171,8 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -DriveController.getLeftY(),
-                        () -> -DriveController.getLeftX(),
+                        () -> -DriveController.getLeftY() * joysticksCoefficient,
+                        () -> -DriveController.getLeftX() * joysticksCoefficient,
                         () -> -DriveController.getRightX()));
 
         // climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
@@ -195,6 +196,17 @@ public class RobotContainer {
                                 () -> -DriveController.getLeftY(),
                                 () -> -DriveController.getLeftX(),
                                 () -> new Rotation2d()));
+        
+        DriveController
+                .x()
+                .onTrue(
+                        new InstantCommand(
+                                () ->{
+                                        joysticksCoefficient = joysticksCoefficient* -1;
+                                }
+                        )
+                )
+
         arm.setDefaultCommand(
                 arm.manualArmCommand(
                         () -> (OperatorController.getLeftY()/2),
