@@ -29,10 +29,9 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
 public class Arm extends SubsystemBase {
   // Add any necessary motor controllers, sensors, or other components here
-  private String state = "neutral";
   private final TalonFX armMotor;
-  private final double armTopLimit = .02;// make sure zero is arm up, or adjust later
-  private final double armBottomLimit = 0.2;// in rotations, ADJUST LATER
+  private final double armTopLimit = .05;// make sure zero is arm up, or adjust later
+  private final double armBottomLimit = 0.22;// in rotations, ADJUST LATER
   private final CANcoder armCANcoder = new CANcoder(53);
   private Boolean commandRan = false;
   
@@ -51,10 +50,6 @@ public class Arm extends SubsystemBase {
   public Arm() {
     // Constructor for the Arm subsystem
     // Initialize components here
-    SmartDashboard.putString("arm pid output", "0");
-    SmartDashboard.putString("arm ", state);
-    SmartDashboard.putBoolean("jiggle mode", jiggleModeUp);
-    SmartDashboard.putBoolean("commandRan", commandRan);
     armMotor = new TalonFX(52);
     armCANcoder.setPosition(0); //hopefully callibrates encoder to zero when robot turns on, adjust if not
     armMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -79,6 +74,11 @@ public class Arm extends SubsystemBase {
     armMotor.getConfigurator().apply(toConfigure);
 
   }
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    updateArmPosition();
+  }
 
   @AutoLogOutput
   private void updateArmPosition() {// having a method for this feels excessive but its the only way i can figure
@@ -88,86 +88,49 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putString("Arm Encoder Position", String.valueOf(armPosition));
   }
   }
-    public void jiggleMotor(){
-    if (armPosition <= .12){
-      jiggleModeUp = false;
-    }
-    else if(armPosition >= .13){
-      jiggleModeUp = true;
-    }
-    if(jiggleModeUp){
-      armMotor.set(-.25);
-    }
-    else{
-      armMotor.set(.25);
-    }
-  }
-  @Override
-  public void periodic(){
-    updateArmPosition();// uncomment when motor is on and set
-    if (state.equals("Extend")) {
-      extendArm();
-    } else if (state.equals("Retract")) {
-      retractArm();
-    } else {
-      armMotor.stopMotor();
-    } if(state.equals("jiggle")){
-      jiggleMotor();
-    }
 
-  SmartDashboard.putString("Arm state", state);
-  SmartDashboard.putString("arm ", state);
-  SmartDashboard.putBoolean("jiggle mode", jiggleModeUp);
-// This method will be called once per scheduler run
-  }
-  public Command toggleJiggleMotor(){
-    return new InstantCommand(() -> {
-      if(state.equals("jiggle")){
-        state = "neutral";
-      }
-      else{
-        state = "jiggle";
-      }
-    }, this);
-  }
   // Add methods to control the arm subsystem
 
 
   public void extendArm() {
-  armPidController.setSetpoint(armBottomLimit);
-  double setpoint = armPidController.getSetpoint();
-  double output = armPidController.calculate(armPosition,setpoint);
-  armMotor.set(output);
-  SmartDashboard.putString("arm pid output", Double.toString(output));
-
+    double output;
+    if(armCANcoder != null && armCANcoder.getPosition().getValueAsDouble() < arm.bottomLimit){
+      output = .65;
+    }
+    else{
+      output = 0;
+    }
+    armMotor.set(output);
+    SmartDashboard.putString("arm output", Double.toString(output));
   }
 
-public void retractArm() { 
-   armPidController.setSetpoint(armTopLimit);
-   double error = armPidController.getErrorTolerance();//not that useful
-   double output = armPidController.calculate(armPosition, armTopLimit);
-   SmartDashboard.putString("arm pid output", Double.toString(output));
-    armMotor.set(output);
+    public void retractArm() { 
+      double output;
+      if(armCANcoder != null && armCANcoder.getPosition().getValueAsDouble() > armTopLimit){
+        output = -.65;
+      }
+      else{
+        output = 0;
+      }
+      SmartDashboard.putString("arm output", Double.toString(output));
+      armMotor.set(output);
  }
   
   public Command extendArmCommand() {
     return new InstantCommand(() -> {
-    state = "Extend";
-    commandRan = true;
-    SmartDashboard.putBoolean("commandRan",commandRan);
+    extendArm();
     }, this);}
 
   public Command retractArmCommand() {
     return new InstantCommand(() -> {
-    state = "Retract";
-    commandRan = true;
+      retractArm();
     }, this);
   }
 
   public void manualArm (DoubleSupplier speed, Arm arm){
-    if (armPosition < armTopLimit && speed.getAsDouble() < 0){
+    if (armCANNcoder.getPosition().getValueAsDouble() > armTopLimit && speed.getAsDouble() < 0){
     armMotor.set(speed.getAsDouble());
-    } else if (armPosition > armBottomLimit && speed.getAsDouble() > 0){
+      } else if (armCANcoder.getPosition().getValueAsDouble() < armBottomLimit && speed.getAsDouble() > 0){
       armMotor.set(speed.getAsDouble());
     } else {
       armMotor.set(0);

@@ -18,7 +18,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -209,12 +208,12 @@ public class RobotContainer {
 
         arm.setDefaultCommand(
                 arm.manualArmCommand(
-                        () -> (OperatorController.getLeftY()/2),
+                        () -> (OperatorController.getLeftY()*.65),
                         arm));
 
         //Setting drive controls
-        OperatorController.rightTrigger().whileTrue(arm.extendArmCommand());
-        OperatorController.leftTrigger().whileTrue(arm.retractArmCommand());
+        OperatorController.rightTrigger().onTrue(arm.extendArmCommand());
+        OperatorController.leftTrigger().onTrue(arm.retractArmCommand());
  //       OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
   //      OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
         //OperatorController.a().onTrue(arm.toggleJiggleMotor());
