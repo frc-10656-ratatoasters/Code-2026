@@ -33,12 +33,10 @@ public class Arm extends SubsystemBase {
   private final double armTopLimit = .05;// make sure zero is arm up, or adjust later
   private final double armBottomLimit = 0.22;// in rotations, ADJUST LATER
   private final CANcoder armCANcoder = new CANcoder(53);
-  private Boolean commandRan = false;
   
   private static final double kP = 0.8; // adjust later
   private static final double kI = 0.0; // adjust later
   private static final double kD = 0.0; // adjust later
-  private boolean jiggleModeUp = true;
   //arm feedforward values?
   //makes a new PID controller
   PIDController armPidController = new PIDController(kP, kI, kD);
@@ -94,7 +92,7 @@ public class Arm extends SubsystemBase {
 
   public void extendArm() {
     double output;
-    if(armCANcoder != null && armCANcoder.getPosition().getValueAsDouble() < arm.bottomLimit){
+    if(armCANcoder != null && armCANcoder.getPosition().getValueAsDouble() < armBottomLimit){
       output = .65;
     }
     else{
@@ -128,7 +126,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void manualArm (DoubleSupplier speed, Arm arm){
-    if (armCANNcoder.getPosition().getValueAsDouble() > armTopLimit && speed.getAsDouble() < 0){
+    if (armCANcoder.getPosition().getValueAsDouble() > armTopLimit && speed.getAsDouble() < 0){
     armMotor.set(speed.getAsDouble());
       } else if (armCANcoder.getPosition().getValueAsDouble() < armBottomLimit && speed.getAsDouble() > 0){
       armMotor.set(speed.getAsDouble());
