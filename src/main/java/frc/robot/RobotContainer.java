@@ -41,7 +41,7 @@ import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.hopper.HopperDistanceSensor;
 import frc.robot.subsystems.hopper.Hopper;
-import edu.wpi.first,wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.autos.*;
 
@@ -205,7 +205,7 @@ public class RobotContainer {
                                         joysticksCoefficient = joysticksCoefficient* -1;
                                 }
                         )
-                )
+                );
 
         arm.setDefaultCommand(
                 arm.manualArmCommand(
