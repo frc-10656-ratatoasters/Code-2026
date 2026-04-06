@@ -31,8 +31,8 @@ public class Arm extends SubsystemBase {
   // Add any necessary motor controllers, sensors, or other components here
   private String state = "neutral";
   private final TalonFX armMotor;
-  private final double armTopLimit = .02;// make sure zero is arm up, or adjust later
-  private final double armBottomLimit = 0.2;// in rotations, ADJUST LATER
+  private final double armTopLimit = .04;// make sure zero is arm up, or adjust later
+  private final double armBottomLimit = 0.18;// in rotations, ADJUST LATER
   private final CANcoder armCANcoder = new CANcoder(53);
   private Boolean commandRan = false;
   
@@ -106,8 +106,10 @@ public class Arm extends SubsystemBase {
   public void periodic(){
     updateArmPosition();// uncomment when motor is on and set
     if (state.equals("Extend")) {
+      //extendArmPID();
       extendArm();
     } else if (state.equals("Retract")) {
+      //retractArmPID();
       retractArm();
     } else {
       armMotor.stopMotor();
@@ -135,22 +137,40 @@ public class Arm extends SubsystemBase {
 
   public void extendArm() {
   if(armCANcoder.getPosition().getValueAsDouble() <= armBottomLimit){
-    armMotor.set(.65);
+    armMotor.set(.68);
   }
   else{
     armMotor.set(0);
   }
   }
 
+  public void extendArmPID (){
+    armPidController.setSetpoint(armBottomLimit);
+    double setpoint = armPidController.getSetpoint();
+    double output = armPidController.calculate(armPosition,setpoint);
+    armMotor.set(output);
+    SmartDashboard.putString("arm pid output", Double.toString(output));
+  }
+
 public void retractArm() { 
   if(armCANcoder.getPosition().getValueAsDouble() >= armTopLimit){
-    armMotor.set(-.65);
+    armMotor.set(-.713);
   }
   else{
     armMotor.set(0);
   }
    
  }
+
+ public void retractArmPID() {
+   armPidController.setSetpoint(armTopLimit);
+    double setpoint = armPidController.getSetpoint();
+    double output = armPidController.calculate(armPosition,setpoint);
+    armMotor.set(output);
+    SmartDashboard.putString("arm pid output", Double.toString(output));
+
+ }
+
 
    
    public Command extendArmCommand() {

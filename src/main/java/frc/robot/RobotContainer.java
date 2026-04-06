@@ -41,6 +41,7 @@ import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.hopper.HopperDistanceSensor;
 import frc.robot.subsystems.hopper.Hopper;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.autos.*;
 
@@ -64,6 +65,7 @@ public class RobotContainer {
     private final Hopper hopper;
     private final HopperDistanceSensor hopperDistanceSensor;
         
+    private int joysticksCoefficient = 1; 
 
     // Controller
     public final CommandXboxController DriveController = new CommandXboxController(0);
@@ -170,8 +172,8 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -DriveController.getLeftY(),
-                        () -> -DriveController.getLeftX(),
+                        () -> -DriveController.getLeftY() * joysticksCoefficient,
+                        () -> -DriveController.getLeftX() *joysticksCoefficient,
                         () -> -DriveController.getRightX()));
 
         // climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
@@ -179,22 +181,33 @@ public class RobotContainer {
         //                 () -> -OperatorController.getLeftY(),
         //                 climber));
 
-        
+        DriveController
+                .x()
+                .onTrue(
+                        new InstantCommand(
+                        () -> {
+                                joysticksCoefficient = joysticksCoefficient * -1;
+                        }
 
+                        ));
         intake.setDefaultCommand(
                 intake.setIntakeSpeed(
                         () -> (-OperatorController.getRightY()/1.5),//lower speed, might change
                         intake));
 
         // Lock to 0° when A button is held
-        DriveController
-                .a()
-                .whileTrue(
-                        DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> -DriveController.getLeftY(),
-                                () -> -DriveController.getLeftX(),
-                                () -> new Rotation2d()));
+        // DriveController
+        //         .a()
+        //         .whileTrue(
+        //                 DriveCommands.joystickDriveAtAngle(
+        //                         drive,
+        //                         () -> -DriveController.getLeftY(),
+        //                         () -> -DriveController.getLeftX(),
+        //                         () -> new Rotation2d()));
+        
+        //brakes our bot so if someone rams us its fine
+        DriveController.a().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
         arm.setDefaultCommand(
                 arm.manualArmCommand(
                         () -> (-OperatorController.getLeftY()/2),
