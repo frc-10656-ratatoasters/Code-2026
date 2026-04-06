@@ -197,7 +197,7 @@ public class RobotContainer {
                                 () -> new Rotation2d()));
         arm.setDefaultCommand(
                 arm.manualArmCommand(
-                        () -> (OperatorController.getLeftY()/2),
+                        () -> (-OperatorController.getLeftY()/2),
                         arm));
 
         //Setting drive controls

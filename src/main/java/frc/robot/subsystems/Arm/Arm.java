@@ -134,35 +134,38 @@ public class Arm extends SubsystemBase {
 
 
   public void extendArm() {
-  armPidController.setSetpoint(armBottomLimit);
-  double setpoint = armPidController.getSetpoint();
-  double output = armPidController.calculate(armPosition,setpoint);
-  armMotor.set(output);
-  SmartDashboard.putString("arm pid output", Double.toString(output));
-
+  if(armCANcoder.getPosition().getValueAsDouble() <= armBottomLimit){
+    armMotor.set(.65);
+  }
+  else{
+    armMotor.set(0);
+  }
   }
 
 public void retractArm() { 
-   armPidController.setSetpoint(armTopLimit);
-   double error = armPidController.getErrorTolerance();//not that useful
-   double output = armPidController.calculate(armPosition, armTopLimit);
-   SmartDashboard.putString("arm pid output", Double.toString(output));
-    armMotor.set(output);
+  if(armCANcoder.getPosition().getValueAsDouble() >= armTopLimit){
+    armMotor.set(-.65);
+  }
+  else{
+    armMotor.set(0);
+  }
+   
  }
-  
-  public Command extendArmCommand() {
-    return new InstantCommand(() -> {
-    state = "Extend";
-    commandRan = true;
-    SmartDashboard.putBoolean("commandRan",commandRan);
+
+   
+   public Command extendArmCommand() {
+   return new InstantCommand(() -> {
+  state = "Extend";
+   commandRan = true;
+     SmartDashboard.putBoolean("commandRan",commandRan);
     }, this);}
 
-  public Command retractArmCommand() {
+   public Command retractArmCommand() {
     return new InstantCommand(() -> {
-    state = "Retract";
+     state = "Retract";
     commandRan = true;
-    }, this);
-  }
+     }, this);
+   }
 
   public void manualArm (DoubleSupplier speed, Arm arm){
     if (armPosition < armTopLimit && speed.getAsDouble() < 0){
