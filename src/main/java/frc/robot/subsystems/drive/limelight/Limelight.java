@@ -12,8 +12,8 @@ public class Limelight {
   private static String IdsTwo = "";
   public static void periodic() {
     
-    // LimelightHelpers.RawFiducial[] fiducialsOne = LimelightHelpers.getRawFiducials("limelight-left");
-    // LimelightHelpers.RawFiducial[] fiducialsTwo = LimelightHelpers.getRawFiducials("limelight-right");
+    // LimelightHelpers.RawFiducial[] fiducialsOne = LimelightHelpers.getRawFiducials("limelight-front");
+    // LimelightHelpers.RawFiducial[] fiducialsTwo = LimelightHelpers.getRawFiducials("limelight-back");
     //  for (LimelightHelpers.RawFiducial f : fiducialsOne) {
     // Limelight.IdsOne = IdsOne + " " + f.id;
     // }

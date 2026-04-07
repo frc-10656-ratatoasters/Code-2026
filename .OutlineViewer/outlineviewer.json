@@ -12,7 +12,7 @@
   "Server": {
     "open": true
   },
-  "limelight-right@2": {
+  "limelight-back@2": {
     "open": true
   },
   "transitory": {
@@ -22,7 +22,7 @@
     "SmartDashboard": {
       "open": true
     },
-    "limelight-left": {
+    "limelight-front": {
       "open": true
     }
   }

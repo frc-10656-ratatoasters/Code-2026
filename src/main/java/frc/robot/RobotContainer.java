@@ -37,10 +37,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Climber.Climber;
-import frc.robot.subsystems.hopper.HopperDistanceSensor;
-import frc.robot.subsystems.hopper.Hopper;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.autos.*;
@@ -61,10 +58,7 @@ public class RobotContainer {
     private final Drive drive;
     private final Intake intake;
     private final Climber climber;
-    private final Arm arm;
-    private final Hopper hopper;
-    private final HopperDistanceSensor hopperDistanceSensor;
-        
+
     private int joysticksCoefficient = 1; 
 
     // Controller
@@ -121,9 +115,6 @@ public class RobotContainer {
 
         intake = new Intake();
         climber = new Climber();
-        arm = new Arm();
-        hopper = new Hopper();
-        hopperDistanceSensor = new HopperDistanceSensor();
 
         // this is the template auto chooser stuff, we are using pathplanner auto
         // chooser now
@@ -150,12 +141,8 @@ public class RobotContainer {
         // public static SendableChooser<Command> mainAutoChooser =
         // AutoBuilder.buildAutoChooser();
 
-
         // Configure the button bindings
-        configureButtonBindings();
-
-        SmartDashboard.putString("Is Hopper Full?", hopperDistanceSensor.hopperState);
-    
+        configureButtonBindings();    
     }
 
         
@@ -208,14 +195,8 @@ public class RobotContainer {
         //brakes our bot so if someone rams us its fine
         DriveController.a().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-        arm.setDefaultCommand(
-                arm.manualArmCommand(
-                        () -> (-OperatorController.getLeftY()/2),
-                        arm));
 
         //Setting drive controls
-        OperatorController.rightTrigger().whileTrue(arm.extendArmCommand());
-        OperatorController.leftTrigger().whileTrue(arm.retractArmCommand());
  //       OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
   //      OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
         //OperatorController.a().onTrue(arm.toggleJiggleMotor());
@@ -224,8 +205,6 @@ public class RobotContainer {
 
         //registering commands for Pathplanner
         NamedCommands.registerCommand("climb L1", climber.ClimbCommand());
-        NamedCommands.registerCommand("Extend Arm", arm.extendArmCommand());
-        NamedCommands.registerCommand("Retract Arm", arm.retractArmCommand());
        // NamedCommands.registerCommand("Intake", new IntakeCommand());
         NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
        // NamedCommands.registerCommand("Outtake", new OuttakeCommand());
