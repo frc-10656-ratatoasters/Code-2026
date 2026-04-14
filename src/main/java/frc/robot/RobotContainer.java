@@ -151,8 +151,6 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
-
-        SmartDashboard.putString("Is Hopper Full?", hopperDistanceSensor.hopperState);
     
     }
 
@@ -166,6 +164,10 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
+                climber.joystickClimbCommand(
+                        () -> -OperatorController.getLeftY() * .05, // slows down climb for testing, adjust later
+                        climber));
         // Default command, normal field-relative drive
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
@@ -179,12 +181,6 @@ public class RobotContainer {
         //                 () -> -OperatorController.getLeftY(),
         //                 climber));
 
-        
-
-        intake.setDefaultCommand(
-                intake.setIntakeSpeed(
-                        () -> (-OperatorController.getRightY()/1.5),//lower speed, might change
-                        intake));
 
         // Lock to 0° when A button is held
         DriveController
@@ -206,14 +202,7 @@ public class RobotContainer {
                         )
                 );
 
-        arm.setDefaultCommand(
-                arm.manualArmCommand(
-                        () -> (OperatorController.getLeftY()*.65),
-                        arm));
-
         //Setting drive controls
-        OperatorController.rightTrigger().onTrue(arm.extendArmCommand());
-        OperatorController.leftTrigger().onTrue(arm.retractArmCommand());
  //       OperatorController.x().onTrue(DriveCommands.newGoToTowerLeftCommand(drive));
   //      OperatorController.b().onTrue(DriveCommands.newGoToTowerRightCommand(drive));
         //OperatorController.a().onTrue(arm.toggleJiggleMotor());

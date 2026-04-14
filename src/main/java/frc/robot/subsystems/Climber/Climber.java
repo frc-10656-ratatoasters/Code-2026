@@ -11,31 +11,29 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.ctre.phoenix6.controls.Follower;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
   // Add any necessary motor controllers, sensors, or other components here
-  public final TalonFX leadClimbMotor;
-  private final TalonFX followerClimbMotor;
-  private final double climbSpeed = .5;// from -1 to 1, might have to reverse
-  public String climberState = "hold";
-
-  private final double climbTopLimit = 0.9;
-  private final double climbBottomLimit = 0.2;
-
+  public final TalonFX climbMotor;
+  private double climbSpeed = .1;// from -1 to 1, might have to reverse
+  public String climberState = "neutral";
+  private final CANcoder climbCANcoder;
+  private double climbTopLimit = 2;
+  private double climbBottomLimit = .5;
+  private double descendSpeed = -.5;// from -1 to 1, might have to reverse
   public Climber() {
     // Constructor for the Climber subsystem
     // Initialize components here
-    leadClimbMotor = new TalonFX(57); // change canID
-    followerClimbMotor = new TalonFX(58); // change canID later
-    followerClimbMotor.setControl(new Follower(10, MotorAlignmentValue.Aligned));
-    // followerClimbMotor.setControlMode(ControlModeValue.Follower,
-    // leadClimbMotor.getDeviceID());
+    climbMotor = new TalonFX(57); 
+    climbCANcoder = new CANcoder(58);
+    // climbMotor.getDeviceID());
     // makes it brake when off, so it doesnt fall off
-    leadClimbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
-    followerClimbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+    climbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Coast);
   }
 
   @AutoLogOutput
@@ -45,14 +43,36 @@ public class Climber extends SubsystemBase {
 
   @Override
   public void periodic() {
+    climbTopLimit = SmartDashboard.getNumber("input Climber Top limit, so higher rotations", 1);
+    climbBottomLimit = SmartDashboard.getNumber("input Climber Bottom limit, so lower rotations", .5);
+    climbSpeed = SmartDashboard.getNumber("input Climb Speed, from -1 to 1", .1);
+    descendSpeed = SmartDashboard.getNumber("input Descend Speed, from -1 to 1", -.5);
+    SmartDashboard.putString("Climber State", climberState);
+    System.out.println("Climber Position" + climbMotor.getPosition().getValueAsDouble());
+  
+    SmartDashboard.putNumber("Climber motor Position", climbMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Climb position from encoder", climbCANcoder.getAbsolutePosition().getValueAsDouble());
+
     //logClimberState();//uncomment once motors on
-    // This method will be called once per scheduler run
-    if (climberState.equals("climb") && leadClimbMotor.getPosition().getValueAsDouble() < climbTopLimit) {
-      leadClimbMotor.set(climbSpeed);
+    if (climberState.equals("neutral")){//sets it to coast when neutral mode
+      climbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Coast);
+      climbMotor.stopMotor();
+    }
+    if (climberState.equals("climb") && climbMotor.getPosition().getValueAsDouble() < climbTopLimit) {
+      climbMotor.set(climbSpeed);
+      if (climbMotor.getPosition().getValueAsDouble() >= climbTopLimit) {
+        climberState = "hold";
+      }
     } else if (climberState.equals("hold")) {
-      leadClimbMotor.stopMotor();// idk the difference from set(0)
-    } else if (climberState.equals("descend") && leadClimbMotor.getPosition().getValueAsDouble() > climbBottomLimit) {
-      leadClimbMotor.set(-.5);
+      climbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+      climbMotor.stopMotor();
+    } else if (climberState.equals("descend")) {
+        if(climbMotor.getPosition().getValueAsDouble() > climbBottomLimit)
+          climbMotor.set(descendSpeed);//this is confusing cause descend means climb actually goes up...
+        else{
+          climbMotor.stopMotor();
+          climberState = "neutral";
+        }
     }
 
     // This method will be called once per scheduler run
@@ -68,7 +88,7 @@ public class Climber extends SubsystemBase {
   public void stopClimber() {
     // Code to stop the climber mechanism
     // probably does some sort of locking thing so it doeesnt fall off? idk
-    leadClimbMotor.stopMotor();
+    climbMotor.stopMotor();
     climberState = "hold";
   }
 
@@ -103,11 +123,11 @@ public class Climber extends SubsystemBase {
         () -> {
           if (speed.getAsDouble() != 0) {
             climber.climberState = "manual";
-            climber.leadClimbMotor.set(speed.getAsDouble());
+            climber.climbMotor.set(speed.getAsDouble());
+            SmartDashboard.putString("Climber Output", Double.toString(speed.getAsDouble()));
           } else {
-            if (climber.climberState.equals("manual")) {
-              climber.leadClimbMotor.stopMotor();
-            }
+            climber.climberState = "hold";
+            climber.climbMotor.stopMotor();
           }
         }, this);
   }

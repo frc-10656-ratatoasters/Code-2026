@@ -48,7 +48,7 @@ public class Arm extends SubsystemBase {
   public Arm() {
     // Constructor for the Arm subsystem
     // Initialize components here
-    armMotor = new TalonFX(52);
+    armMotor = new TalonFX(100);
     armCANcoder.setPosition(0); //hopefully callibrates encoder to zero when robot turns on, adjust if not
     armMotor.setNeutralMode(NeutralModeValue.Brake);
     configureCurrentLimits();
