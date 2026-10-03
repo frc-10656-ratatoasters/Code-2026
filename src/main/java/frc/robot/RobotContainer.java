@@ -163,11 +163,11 @@ public class RobotContainer {
                         () -> -DriveController.getLeftX() *joysticksCoefficient,
                         () -> -DriveController.getRightX()));
 
-        // climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
-        //         climber.joystickClimbCommand(
-        //                 () -> -OperatorController.getLeftY(),
-        //                 climber));
-
+        /*climber.setDefaultCommand(// should remove before comp, its so operator joysticks control climb
+                 climber.joystickClimbCommand(
+                         () -> -DriveController.getRightY(),
+                         climber));
+        */
         DriveController
                 .x()
                 .onTrue(

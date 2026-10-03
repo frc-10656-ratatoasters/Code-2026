@@ -26,7 +26,7 @@ public class Climber extends SubsystemBase {
   public Climber() {
     // Constructor for the Climber subsystem
     // Initialize components here
-    climbMotor = new TalonFX(52);
+    climbMotor = new TalonFX(57);
     // climbMotor.getDeviceID());
     // makes it brake when off, so it doesnt fall off
     climbMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
