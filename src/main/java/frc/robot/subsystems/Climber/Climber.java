@@ -97,13 +97,17 @@ public class Climber extends SubsystemBase {
         },
         this);
   }
-
+}
+  /* 
   public Command joystickClimbCommand(DoubleSupplier speed, Climber climber){
     return new InstantCommand(
         () -> {
           if (speed.getAsDouble() != 0) {
-            climber.climberState = "manual";
-            climber.leadClimbMotor.set(speed.getAsDouble());
+            if (Math.abs(speed.getAsDouble()) > 0.7)
+            {
+              climber.climberState = "manual";
+              climber.leadClimbMotor.set(-speed.getAsDouble());
+            }
           } else {
             if (climber.climberState.equals("manual")) {
               climber.leadClimbMotor.stopMotor();
@@ -112,3 +116,4 @@ public class Climber extends SubsystemBase {
         }, this);
   }
 }
+*/
