@@ -13,7 +13,7 @@
     "No Climb Autos",
     "Red Autos"
   ],
-  "defaultMaxVel": 3.0,
+  "defaultMaxVel": 3.0, //3 orginal
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
