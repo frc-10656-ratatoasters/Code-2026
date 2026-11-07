@@ -36,6 +36,7 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.drive.Shooter;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.Climber.Climber;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -210,11 +211,12 @@ public class RobotContainer {
        // NamedCommands.registerCommand("Outtake", new OuttakeCommand());
         NamedCommands.registerCommand("Stop Outake", intake.stopIntakeCommand());
 
-
+        Shooter shooter = new Shooter();
         // Switch to X pattern when X button is pressed
         // DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive)); //was
         // in the template
         DriveController.y().onTrue(Commands.runOnce(drive::zeroGyro, drive));
+        DriveController.x().onTrue(shooter.toggle());
         // Reset gyro to 0° when b button is pressed
         DriveController
                 .b()
