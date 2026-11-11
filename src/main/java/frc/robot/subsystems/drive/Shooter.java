@@ -15,12 +15,13 @@ public class Shooter extends SubsystemBase {
 
     public Shooter() {
 
-        ShootMotor = new TalonFX(51);
+        ShootMotor = new TalonFX(61);
 
         shooting = false;
         shootSpd = 0.3;
     }
-
+//Spamton mining sim -Snow
+//... -Roman
     public InstantCommand toggle() {
         return new InstantCommand(
         () -> {shooting = !shooting;}
