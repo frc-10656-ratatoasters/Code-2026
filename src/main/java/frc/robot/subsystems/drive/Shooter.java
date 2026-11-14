@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Shooter extends SubsystemBase {
     
     final TalonFX ShootMotor;
-    boolean shooting;
+    public boolean shooting;
     double shootSpd;
 
     public Shooter() {
@@ -31,7 +31,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
     Logger.recordOutput("Shooting Variable: ", shooting);  
-
+    
     if (shooting == true)
     {
         ShootMotor.set(shootSpd);

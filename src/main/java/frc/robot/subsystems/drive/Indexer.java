@@ -19,6 +19,7 @@ public class Indexer extends SubsystemBase{
     boolean indexing;
     double indexSpd;
     Shooter partShooter;
+    boolean shooting;
 
     public Indexer(Shooter partnerShooter) {
 
@@ -43,13 +44,18 @@ public class Indexer extends SubsystemBase{
     @Override
     public void periodic() {
     
-    if (indexing == true)
+    if (indexing == true && shooting == true)
     {
         IndexMotor.set(indexSpd);
+    } else if (indexing == true && shooting == false)
+    {
+        indexing = false;
     } else
     {
         IndexMotor.stopMotor();
     }
     
+    shooting = partShooter.shooting;
+
     }
 }
