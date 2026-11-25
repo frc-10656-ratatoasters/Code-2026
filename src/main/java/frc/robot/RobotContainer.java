@@ -37,12 +37,15 @@ import frc.robot.subsystems.drive.Indexer;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.drive.Outtake;
 import frc.robot.subsystems.drive.Shooter;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.Climber.Climber;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.autos.*;
+
+import java.security.spec.NamedParameterSpec;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -60,6 +63,7 @@ public class RobotContainer {
     private final Drive drive;
     private final Intake intake;
     private final Climber climber;
+    private final Outtake outtake;
 
     private int joysticksCoefficient = 1;
 
@@ -205,16 +209,19 @@ public class RobotContainer {
         //OperatorController.y().onTrue(climber.ClimbCommand());// includes safe limit
         //OperatorController.a().onTrue(climber.HoldClimbCommand());
 
+        
         //registering commands for Pathplanner
        // NamedCommands.registerCommand("climb L1", climber.ClimbCommand());
        // NamedCommands.registerCommand("Intake", new IntakeCommand());
        // NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
        // NamedCommands.registerCommand("Outtake", new OuttakeCommand());
-       // NamedCommands.registerCommand("Stop Outake", intake.stopIntakeCommand());
+      //  NamedCommands.registerCommand("Stop Outake", intake.stopIntakeCommand());
 
         Shooter shooter = new Shooter();
         Indexer indexer = new Indexer(shooter);
-
+        
+        NamedCommands.registerCommand("Outtake", outtake.doOuttake());
+        
         // Switch to X pattern when X button is pressed
         // DriveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive)); //was
         // in the template
