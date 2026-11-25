@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 12.947060240963856,
-        "y": 5.575807228915662
+        "x": 0.549,
+        "y": 6.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 13.947060240963857,
-        "y": 5.575807228915662
+        "x": 1.549,
+        "y": 6.0
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 15.79919277108434,
-        "y": 7.389807228915663
+        "x": 4.649,
+        "y": 6.0
       },
       "prevControl": {
-        "x": 14.79919277108434,
-        "y": 7.389807228915663
+        "x": 3.649,
+        "y": 6.0
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,20 +31,7 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Extend Arm",
-      "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Outtake",
-      "waypointRelativePos": 0.6528735632183915,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

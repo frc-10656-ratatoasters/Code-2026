@@ -59,7 +59,7 @@ public class RobotContainer {
     private final Intake intake;
     private final Climber climber;
 
-    private int joysticksCoefficient = 1; 
+    private int joysticksCoefficient = 1;
 
     // Controller
     public final CommandXboxController DriveController = new CommandXboxController(0);
@@ -204,11 +204,11 @@ public class RobotContainer {
         //OperatorController.a().onTrue(climber.HoldClimbCommand());
 
         //registering commands for Pathplanner
-        NamedCommands.registerCommand("climb L1", climber.ClimbCommand());
+       // NamedCommands.registerCommand("climb L1", climber.ClimbCommand());
        // NamedCommands.registerCommand("Intake", new IntakeCommand());
-        NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
+       // NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
        // NamedCommands.registerCommand("Outtake", new OuttakeCommand());
-        NamedCommands.registerCommand("Stop Outake", intake.stopIntakeCommand());
+       // NamedCommands.registerCommand("Stop Outake", intake.stopIntakeCommand());
 
 
         // Switch to X pattern when X button is pressed
